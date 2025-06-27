@@ -160,7 +160,7 @@ namespace ast {
         std::shared_ptr<Exp> right;
         // Operation
         RelOpType op;
-
+        std::string beginL;
         // Constructor that receives the left and right operands and the operation
         RelOp(std::shared_ptr<Exp> left, std::shared_ptr<Exp> right, RelOpType op);
 
@@ -174,7 +174,7 @@ namespace ast {
     public:
         // Operand
         std::shared_ptr<Exp> exp;
-
+std::string beginL;
         // Constructor that receives the operand
         explicit Not(std::shared_ptr<Exp> exp);
 

@@ -39,14 +39,14 @@ define void @print(i8*) {
     )");
 }
 
-    void codeGvisitor::visit(ast::ArrayType &node){}//today 
+    void codeGvisitor::visit(ast::ArrayType &node){}
     void codeGvisitor::visit(FuncDecl& node){}
     void codeGvisitor::visit(VarDecl& node) {}
     void codeGvisitor::visit(Return& node) {}
     void codeGvisitor::visit(Assign& node)
      { 
     node.exp->accept(*this);
-    auto expVar = node.exp->newVar;
+    auto expNewVar = node.exp->newVar;
 
    
     int off = node.id->offset; 
@@ -61,13 +61,13 @@ define void @print(i8*) {
    //  cb->emit(elemPtr +
      //   " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
      //   basePtr + ", i32 " + indexVar);
-    cb->emit("store " + tyoechanged + " " + expVar + ", " + tyoechanged + "* " + castPtr + ", align 4");}
-    void codeGvisitor::visit(If& node) {}
-    void codeGvisitor::visit(While& node) {}
+    cb->emit("store " + tyoechanged + " " + expNewVar + ", " + tyoechanged + "* " + castPtr + ", align 4");}
+    void codeGvisitor::visit(If& node) {}//today
+    void codeGvisitor::visit(While& node) {}//today
     void codeGvisitor::visit(Break& node) {}
     void codeGvisitor::visit(Continue& node) {}
-    void codeGvisitor::visit(Call& node) {}
-    void codeGvisitor::visit(ExpList& node) {}
+    void codeGvisitor::visit(Call& node) {}//today
+    void codeGvisitor::visit(ExpList& node) {}//done
     void codeGvisitor::visit(ast::ArrayAssign &node) {
 node.id->accept(*this);
     node.index->accept(*this);
@@ -86,7 +86,7 @@ node.id->accept(*this);
         cb->emit(z + " = zext i8 " + indexVar + " to i32");
         indexVar = z;
     }
-    std::string expVar = node.exp->newVar;
+    std::string expNewVar = node.exp->newVar;
      int baseoff = node.id->offset;
      std::string newbasePtrI32 = cb->freshVar();
         cb->emit(newbasePtrI32 +
@@ -112,17 +112,17 @@ node.id->accept(*this);
     if (node.exp->type == ast::BuiltInType::BYTE &&
         arrType == ast::BuiltInType::INT) {
         std::string rhsExt = cb->freshVar();
-        cb->emit(rhsExt + " = zext i8 " + expVar + " to i32");
-        expVar = rhsExt;
+        cb->emit(rhsExt + " = zext i8 " + expNewVar + " to i32");
+        expNewVar = rhsExt;
     } else if (node.exp->type == ast::BuiltInType::INT &&
                arrType == ast::BuiltInType::BYTE) {
         std::string rhsTrunc = cb->freshVar();
-        cb->emit(rhsTrunc + " = trunc i32 " + expVar + " to i8");
-        expVar = rhsTrunc;
+        cb->emit(rhsTrunc + " = trunc i32 " + expNewVar + " to i8");
+        expNewVar = rhsTrunc;
     }
 
    
-    cb->emit("store " + elemLLVM + " " + expVar + ", " +
+    cb->emit("store " + elemLLVM + " " + expNewVar + ", " +
                     elemLLVM + "* " + elemPtr + ", align 4");
 
 
@@ -142,7 +142,10 @@ node.id->accept(*this);
     node.funcs[i]->accept(*this);
 }}
     void codeGvisitor::visit(ast::PrimitiveType &node){}//done
-    void codeGvisitor::visit(ast::Formal &node) {}//today
+    void codeGvisitor::visit(ast::Formal &node) {
+          std::string funcp = output::changeType(node.id->type) + " %" + node.id->value;
+   cb->emit(funcp);
+    }//today
     void codeGvisitor::visit(ast::Formals &node) { for (size_t i = 0; i < node.formals.size(); ++i) {
         node.formals[i]->accept(*this);
         if (i != node.formals.size() - 1) {
@@ -194,13 +197,33 @@ node.id->accept(*this);
     // Set the result
     node.newVar = newV;
 }
-    void codeGvisitor::visit(BinOp& node) {
+    void codeGvisitor::visit(BinOp& node) {//s3be bukra bkmlha
      node.left->accept(*this);
     node.right->accept(*this);
-
+std::string leftNewVar=node.left->newVar;
+std::string rightNewVar=node.right->newVar;
+//auto builtype=node.type;
     }//today
     void codeGvisitor::visit(RelOp& node) {}//today
-    void codeGvisitor::visit(Not& node) {}
+    void codeGvisitor::visit(Not& node) {node.exp->accept(*this);
+    std::string whatwegot=node.exp->newVar;
+    std::string mancjild=cb->freshVar();
+     cb->emit(mancjild + " = xor i1 " + whatwegot + ", true");
+    if (auto n = dynamic_cast<ast::Not*>(node.exp.get())) {
+        node.beginL = n->beginL;
+    } else if (auto checkrel = dynamic_cast<ast::RelOp*>(node.exp.get())) {
+        node.beginL = checkrel->beginL;
+    } else  {
+        std::string enoughL = cb->freshLabel();
+        cb->emit("br label " + enoughL);
+        cb->emit("");
+        cb->emitLabel(enoughL);
+        node.beginL = enoughL;
+    }
+ 
+    
+    node.newVar = mancjild;
+    }
     void codeGvisitor::visit(And& node) {}
     void codeGvisitor::visit(Or& node) {}
     void codeGvisitor::visit(ArrayDereference& node) {
@@ -248,7 +271,38 @@ node.newVar=label;
 
 
     }//today
-    void codeGvisitor::visit(Cast& node) {}//today
+    void codeGvisitor::visit(Cast& node) 
+    {
+          // Visit the expression to generate its code
+    node.exp->accept(*this);
+    std::string expNewVar = node.exp->newVar;
+
+    
+    auto whatWeHave = node.exp->type;
+    auto whatWeWant = node.target_type->type;
+
+   
+    std::string toCas = cb->freshVar();
+
+    if (whatWeHave == ast::BuiltInType::INT && whatWeWant == ast::BuiltInType::BYTE) {
+        // Truncate int to byte
+        cb->emit(toCas + " = trunc i32 " + expNewVar + " to i8");
+    }  
+     else if (whatWeHave == ast::BuiltInType::BYTE && whatWeWant == ast::BuiltInType::INT) {
+        // Zero extend byte to int
+        cb->emit(toCas + " = zext i8 " + expNewVar + " to i32");}
+    
+     else if (whatWeHave == whatWeWant) {
+   
+        toCas = expNewVar;
+    } else {
+      //do we need an error 
+       // throw std::runtime_error("Invalid cast from " + output::changeType(whatWeHave) + " to " + output::changeType(whatWeWant));
+    }
+
+    // Store the result in the node's llvmVar
+    node.newVar = toCas;
+    }//today
    //codeGvisitor::visit(ast::PrimitiveType& node) {}
    /*-----------------------------------------------------------------
  *  Helper: emit a run-time “out-of-bounds” check for an array index.
