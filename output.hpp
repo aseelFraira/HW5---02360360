@@ -35,7 +35,7 @@ namespace output {
     void errorMainMissing();
 
     void errorByteTooLarge(int lineno, int value);
-
+    std::string changeType(ast::BuiltInType type);
     void ErrorInvalidAssignArray(int lineno, const std::string &id_arr);
 
     /* ScopePrinter class
@@ -116,11 +116,12 @@ namespace output {
     };
 
     std::ostream &operator<<(std::ostream &os, const CodeBuffer &buffer);
+   
 }
 
 
 
-std::string changeType(ast::BuiltInType type);
+//std::string changeType(ast::BuiltInType type);
 
 
 

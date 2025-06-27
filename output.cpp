@@ -193,7 +193,7 @@ namespace output {
     }
 }
 
-std::string changeType(ast::BuiltInType type) {
+std::string output::changeType(ast::BuiltInType type) {
     static const std::unordered_map<ast::BuiltInType, std::string> typeMap = {
         {ast::BuiltInType::INT, "i32"},
         {ast::BuiltInType::BOOL, "i1"},

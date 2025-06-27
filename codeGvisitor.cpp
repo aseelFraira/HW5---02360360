@@ -78,9 +78,32 @@ define void @print(i8*) {
          if(node.value==true)
     {node.newVar="true";}
     else{node.newVar="false";}}
-    void codeGvisitor::visit(ID& node) {//today
-
+    void codeGvisitor::visit(ID& node) 
+    {//today
+    if (node.offset < 0) {
+        node.newVar = "%" + node.value;
+        return;
     }
+
+    // Local variables (from local_vars array)
+    const int offset = node.offset;
+    const std::string ltype =output::changeType(node.type);
+
+    // Compute address of the variable: %addr = getelementptr ...
+    std::string inbetweenadrrs = cb->freshVar();
+    cb->emit(inbetweenadrrs + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(offset));
+
+    // Cast the pointer to the correct LLVM type: %cast = bitcast ...
+    std::string cpointer = cb->freshVar();
+    cb->emit(cpointer + " = bitcast i32* " + inbetweenadrrs + " to " + ltype + "*");
+
+    // Load the value from memory: %val = load ...
+    std::string newV = cb->freshVar();
+    cb->emit(newV + " = load " + ltype + ", " + ltype + "* " + cpointer + ", align 4");
+
+    // Set the result
+    node.newVar = newV;
+}
     void codeGvisitor::visit(BinOp& node) {}//today
     void codeGvisitor::visit(RelOp& node) {}//today
     void codeGvisitor::visit(Not& node) {}
