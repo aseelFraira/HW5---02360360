@@ -8,7 +8,8 @@ using namespace ast;
 class codeGvisitor : public Visitor {
 public:
     codeGvisitor(output::CodeBuffer* cb);
-
+std::string emitOobCheck(const std::string& idxVar,
+                                         int length);
     void visit(ast::ArrayType &node) override;
     void visit(FuncDecl& node) override;
     void visit(VarDecl& node) override;

@@ -15,6 +15,7 @@ declare void @exit(i32)
 @.int_specifier_scan = constant [3 x i8] c"%d\00"
 @.int_specifier = constant [4 x i8] c"%d\0A\00"
 @.str_specifier = constant [4 x i8] c"%s\0A\00"
+@.oob_str = constant [19 x i8] c"Error out of bounds\00"
 
 define i32 @readi(i32) {
     %ret_val = alloca i32
@@ -39,8 +40,8 @@ define void @print(i8*) {
 }
 
     void codeGvisitor::visit(ast::ArrayType &node){}//today 
-    void codeGvisitor::visit(FuncDecl& node){}//today 
-    void codeGvisitor::visit(VarDecl& node) {}//today
+    void codeGvisitor::visit(FuncDecl& node){}
+    void codeGvisitor::visit(VarDecl& node) {}
     void codeGvisitor::visit(Return& node) {}
     void codeGvisitor::visit(Assign& node) {}//today 
     void codeGvisitor::visit(If& node) {}
@@ -53,8 +54,15 @@ define void @print(i8*) {
 node.id->accept(*this);
     node.index->accept(*this);
     node.exp->accept(*this);// accepting everything 
+     std::string indexVar = node.index->newVar;
+// auto arrTy =(node.id->type);
+// emitOobCheck(indexVar, arrTy->length);
 
- std::string indexVar = node.index->newVar;
+
+
+
+
+//TO DO : RE DO THE LENGTH IN THE ARRAY SO THE EMIT OOB FUNCTION COULD FUNCTION NORMALLY 
   if (node.index->type == ast::BuiltInType::BYTE) {
         std::string z = cb->freshVar();
         cb->emit(z + " = zext i8 " + indexVar + " to i32");
@@ -173,6 +181,102 @@ node.id->accept(*this);
     void codeGvisitor::visit(Not& node) {}
     void codeGvisitor::visit(And& node) {}
     void codeGvisitor::visit(Or& node) {}
-    void codeGvisitor::visit(ArrayDereference& node) {}//today
+    void codeGvisitor::visit(ArrayDereference& node) {
+
+    node.id->accept(*this);
+  auto type=node.id->type;
+  auto changedType=output::changeType(type);
+    node.index->accept(*this);
+    std::string indexVar=node.index->newVar;
+    if (node.index->type == ast::BuiltInType::BYTE) {           // ★ NEW
+    std::string z = cb->freshVar();                             // ★ NEW
+    cb->emit(z + " = zext i8 " + indexVar + " to i32");         // ★ NEW
+    indexVar = z;                                               // ★ NEW
+}
+
+    int offset=node.id->offset;
+std::string getElement=cb->freshVar();
+cb->emit( getElement+" = getelementptr i32, i32* %local_vars, i32 " +
+std::to_string(offset));
+ /* ---------- 3.  Bit-cast slot pointer to the real element type ---------- */
+    std::string basePtr = cb->freshVar();                            // ★ NEW
+    cb->emit(basePtr + " = bitcast i32* " + getElement +             // ★ NEW
+             " to " + changedType + "*");                            // ★ NEW
+     //std::string indexVar = node.index->newVar;
+     std::string elemPtr = cb->freshVar();
+
+   
+    cb->emit(elemPtr + " = getelementptr " + changedType + ", " +
+             changedType + "* " + basePtr + ", i32 " + indexVar);
+
+   
+    // std::string label=cb->freshVar();
+    // cb->emit(label+" = load "+changedType+", "+changedType+"* "+elemPtr);
+  std::string label = cb->freshVar();
+    cb->emit(label + " = load " + changedType + ", " + changedType +
+             "* " + elemPtr + ", align 4");   
+
+node.newVar=label;
+// %print_ptr = getelementptr i32, i32* %arr, i32 %print_index   ; ① compute address
+// %element   = load i32, i32* %print_ptr                        ; ② fetch value
+
+//  cb->emit(elemPtr +
+     //   " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
+     //   basePtr + ", i32 " + indexVar);
+
+
+    }//today
     void codeGvisitor::visit(Cast& node) {}//today
    //codeGvisitor::visit(ast::PrimitiveType& node) {}
+   /*-----------------------------------------------------------------
+ *  Helper: emit a run-time “out-of-bounds” check for an array index.
+ *  If 0 ≤ idxVar < length  — fall through to the label it returns.
+ *  Otherwise it prints "Error out of bounds", calls exit(1)
+ *  and ends the control-flow with 'unreachable'.
+ *
+ *  Parameters:
+ *      idxVar  – SSA name (i32) of the index
+ *      length  – compile-time constant length of the array
+ *
+ *  Returns:
+ *      std::string okLabel  – the label you should jump to
+ *                             (function already opens it for you)
+ *----------------------------------------------------------------*/
+
+
+//TO DO : RE DO THE LENGTH IN THE ARRAY SO THE EMIT OOB FUNCTION COULD FUNCTION NORMALLY 
+std::string codeGvisitor::emitOobCheck(const std::string& idxVar,
+                                         int length)
+{
+    std::string okLabel  = cb->freshLabel();
+    std::string errLabel = cb->freshLabel();
+
+    /* idx < 0 ? */
+    std::string isNeg = cb->freshVar();
+    cb->emit(isNeg + " = icmp slt i32 " + idxVar + ", 0");
+
+    /* idx < length ? */
+    std::string inRange = cb->freshVar();
+    cb->emit(inRange + " = icmp slt i32 " + idxVar + ", "
+             + std::to_string(length));
+
+    /* ok = !isNeg  &&  inRange */
+    std::string ok = cb->freshVar();
+    cb->emit(ok + " = and i1 " + inRange + ", xor i1 " + isNeg + ", true");
+
+    /* conditional branch */
+    cb->emit("br i1 " + ok + ", label " + okLabel + ", label " + errLabel);
+
+    /* -------- error block -------- */
+    cb->emitLabel(errLabel);
+    std::string msgPtr = cb->freshVar();
+    cb->emit(msgPtr +
+        " = getelementptr [19 x i8], [19 x i8]* @.oob_str, i32 0, i32 0");
+    cb->emit("call void @print(i8* " + msgPtr + ")");
+    cb->emit("call void @exit(i32 1)");
+    cb->emit("unreachable");
+
+    /* -------- ok block opens here -------- */
+    cb->emitLabel(okLabel);
+    return okLabel;                 // caller continues right after this label
+}
