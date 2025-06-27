@@ -43,7 +43,25 @@ define void @print(i8*) {
     void codeGvisitor::visit(FuncDecl& node){}
     void codeGvisitor::visit(VarDecl& node) {}
     void codeGvisitor::visit(Return& node) {}
-    void codeGvisitor::visit(Assign& node) {}//today 
+    void codeGvisitor::visit(Assign& node)
+     { 
+    node.exp->accept(*this);
+    auto expVar = node.exp->newVar;
+
+   
+    int off = node.id->offset; 
+    std::string offPoi = cb->freshVar();
+    cb->emit(offPoi + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(off));
+
+  
+    std::string tyoechanged = output::changeType(node.exp->type); 
+    std::string castPtr = cb->freshVar();
+    cb->emit(castPtr + " = bitcast i32* " + offPoi + " to " + tyoechanged + "*");
+
+   //  cb->emit(elemPtr +
+     //   " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
+     //   basePtr + ", i32 " + indexVar);
+    cb->emit("store " + tyoechanged + " " + expVar + ", " + tyoechanged + "* " + castPtr + ", align 4");}
     void codeGvisitor::visit(If& node) {}
     void codeGvisitor::visit(While& node) {}
     void codeGvisitor::visit(Break& node) {}
@@ -176,7 +194,11 @@ node.id->accept(*this);
     // Set the result
     node.newVar = newV;
 }
-    void codeGvisitor::visit(BinOp& node) {}//today
+    void codeGvisitor::visit(BinOp& node) {
+     node.left->accept(*this);
+    node.right->accept(*this);
+
+    }//today
     void codeGvisitor::visit(RelOp& node) {}//today
     void codeGvisitor::visit(Not& node) {}
     void codeGvisitor::visit(And& node) {}
@@ -188,10 +210,10 @@ node.id->accept(*this);
   auto changedType=output::changeType(type);
     node.index->accept(*this);
     std::string indexVar=node.index->newVar;
-    if (node.index->type == ast::BuiltInType::BYTE) {           // ★ NEW
-    std::string z = cb->freshVar();                             // ★ NEW
-    cb->emit(z + " = zext i8 " + indexVar + " to i32");         // ★ NEW
-    indexVar = z;                                               // ★ NEW
+    if (node.index->type == ast::BuiltInType::BYTE) {           
+    std::string z = cb->freshVar();                           
+    cb->emit(z + " = zext i8 " + indexVar + " to i32");         
+    indexVar = z;                                               
 }
 
     int offset=node.id->offset;
@@ -199,9 +221,9 @@ std::string getElement=cb->freshVar();
 cb->emit( getElement+" = getelementptr i32, i32* %local_vars, i32 " +
 std::to_string(offset));
  /* ---------- 3.  Bit-cast slot pointer to the real element type ---------- */
-    std::string basePtr = cb->freshVar();                            // ★ NEW
-    cb->emit(basePtr + " = bitcast i32* " + getElement +             // ★ NEW
-             " to " + changedType + "*");                            // ★ NEW
+    std::string basePtr = cb->freshVar();                            
+    cb->emit(basePtr + " = bitcast i32* " + getElement +           
+             " to " + changedType + "*");                           
      //std::string indexVar = node.index->newVar;
      std::string elemPtr = cb->freshVar();
 
