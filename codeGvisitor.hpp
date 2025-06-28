@@ -30,7 +30,7 @@ std::string emitOobCheck(const std::string& idxVar,
 
 
     void visit(Statements& node) override;
- 
+    void widenByte(std::string& valss, ast::BuiltInType typee);
     void visit(Num& node) override;
     void visit(NumB& node) override;
     void visit(String& node) override;

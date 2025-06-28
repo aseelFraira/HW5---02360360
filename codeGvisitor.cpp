@@ -42,7 +42,7 @@ define void @print(i8*) {
     void codeGvisitor::visit(ast::ArrayType &node){}
     void codeGvisitor::visit(FuncDecl& node){}
     void codeGvisitor::visit(VarDecl& node) {}
-    void codeGvisitor::visit(Return& node) {}
+    void codeGvisitor::visit(Return& node) {}//TODAY
     void codeGvisitor::visit(Assign& node)
      { 
     node.exp->accept(*this);
@@ -62,11 +62,11 @@ define void @print(i8*) {
      //   " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
      //   basePtr + ", i32 " + indexVar);
     cb->emit("store " + tyoechanged + " " + expNewVar + ", " + tyoechanged + "* " + castPtr + ", align 4");}
-    void codeGvisitor::visit(If& node) {}//today
-    void codeGvisitor::visit(While& node) {}//today
-    void codeGvisitor::visit(Break& node) {}
-    void codeGvisitor::visit(Continue& node) {}
-    void codeGvisitor::visit(Call& node) {}//today
+    void codeGvisitor::visit(If& node) {}//TODAY
+    void codeGvisitor::visit(While& node) {}//TODAY
+    void codeGvisitor::visit(Break& node) {}//TODAY
+    void codeGvisitor::visit(Continue& node) {}//TODAY
+    void codeGvisitor::visit(Call& node) {}
     void codeGvisitor::visit(ExpList& node) {}//done
     void codeGvisitor::visit(ast::ArrayAssign &node) {
 node.id->accept(*this);
@@ -204,7 +204,30 @@ std::string leftNewVar=node.left->newVar;
 std::string rightNewVar=node.right->newVar;
 //auto builtype=node.type;
     }//today
-    void codeGvisitor::visit(RelOp& node) {}//today
+    void codeGvisitor::visit(RelOp& node) {
+ node.left->accept(*this);
+ node.right->accept(*this);
+ std::string leftNewVar=node.left->newVar;
+ std::string rightNewVar=node.right->newVar;
+
+ //did w ch an 
+ 
+    codeGvisitor::widenByte(leftNewVar, node.left ->type);
+    codeGvisitor::widenByte(rightNewVar, node.right->type);
+   std::string result= cb->freshVar();
+    std::string op;
+    switch (node.op) {
+    case ast::RelOpType::EQ: op = "eq";  break;
+   
+    case ast::RelOpType::LT: op = "slt"; break;
+    case ast::RelOpType::GT: op = "sgt"; break;
+    case ast::RelOpType::LE: op = "sle"; break;
+    case ast::RelOpType::NE: op = "ne";  break;
+    case ast::RelOpType::GE: op = "sge"; break;
+    }
+    cb->emit(result + " = icmp " + op + " i32 " + leftNewVar + ", " + rightNewVar);
+    node.newVar = result;
+    }//TODAY
     void codeGvisitor::visit(Not& node) {node.exp->accept(*this);
     std::string whatwegot=node.exp->newVar;
     std::string mancjild=cb->freshVar();
@@ -399,11 +422,12 @@ std::string rightNewVar=node.right->newVar;
   auto changedType=output::changeType(type);
     node.index->accept(*this);
     std::string indexVar=node.index->newVar;
-    if (node.index->type == ast::BuiltInType::BYTE) {           
-    std::string z = cb->freshVar();                           
-    cb->emit(z + " = zext i8 " + indexVar + " to i32");         
-    indexVar = z;                                               
-}
+     codeGvisitor::widenByte(indexVar, node.index->type);
+//     if (node.index->type == ast::BuiltInType::BYTE) {           
+//     std::string z = cb->freshVar();                           
+//     cb->emit(z + " = zext i8 " + indexVar + " to i32");         
+//     indexVar = z;                                               
+// }
 auto len =(node.id->len);
  emitOobCheck(indexVar, len);
     int offset=node.id->offset;
@@ -487,7 +511,14 @@ node.newVar=label;
  *----------------------------------------------------------------*/
 
 
- 
+  void codeGvisitor::widenByte(std::string& valss, ast::BuiltInType typee)
+{
+    if (typee == ast::BuiltInType::BYTE) {
+        std::string zs = cb->freshVar();
+        cb->emit(zs + " = zext i8 " + valss + " to i32");
+        valss = zs;                     
+    }
+}
 std::string codeGvisitor::emitOobCheck(const std::string& idxVar,
                                          int length)
 {
