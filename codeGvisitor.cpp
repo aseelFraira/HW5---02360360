@@ -42,7 +42,7 @@ define void @print(i8*) {
     void codeGvisitor::visit(ast::ArrayType &node){}
     void codeGvisitor::visit(FuncDecl& node){}
     void codeGvisitor::visit(VarDecl& node) {}
-    void codeGvisitor::visit(Return& node) {}//TODAY
+    void codeGvisitor::visit(Return& node) {}
     void codeGvisitor::visit(Assign& node)
      { 
     node.exp->accept(*this);
@@ -59,10 +59,33 @@ define void @print(i8*) {
     cb->emit(castPtr + " = bitcast i32* " + offPoi + " to " + tyoechanged + "*");
 
    //  cb->emit(elemPtr +
-     //   " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
+     //   " = getelementptr " + typeLL + ", " + typeLL + "* " +
      //   basePtr + ", i32 " + indexVar);
     cb->emit("store " + tyoechanged + " " + expNewVar + ", " + tyoechanged + "* " + castPtr + ", align 4");}
-    void codeGvisitor::visit(If& node) {}//TODAY
+    void codeGvisitor::visit(If& node) {
+        node.condition->accept(*this);
+        std::string condVal=node.condition->newVar;
+        //now generate the then and else labels and end 
+        std::string thenLabel=cb->freshLabel();
+        std::string elseL= node.otherwise ? cb->freshLabel() : "";
+        std::string endLabel=cb->freshLabel();
+        cb->emit("br i1 "+condVal+ ", label "+thenLabel+ ", label " +( elseL.empty() ? endLabel : elseL));
+        // here we emit the then vlock
+        cb->emitLabel(thenLabel);
+        node.then->accept(*this);
+        cb->emit("br label "+endLabel);
+
+        //else b
+        if(node.otherwise)
+        {cb->emit("");
+        cb->emitLabel(elseL);
+            node.otherwise->accept(*this);
+            cb->emit("br label "+ endLabel);
+
+        }
+        cb->emitLabel(endLabel);
+cb->emit("");
+    }//TODAY
     void codeGvisitor::visit(While& node) {}//TODAY
     void codeGvisitor::visit(Break& node) {}//TODAY
     void codeGvisitor::visit(Continue& node) {}//TODAY
@@ -77,15 +100,16 @@ auto len =(node.id->len);
  emitOobCheck(indexVar, len);
 
 
-
+codeGvisitor::widenByte(indexVar, node.index->type);
 
 
 //TO DO : RE DO THE LENGTH IN THE ARRAY SO THE EMIT OOB FUNCTION COULD FUNCTION NORMALLY 
-  if (node.index->type == ast::BuiltInType::BYTE) {
-        std::string z = cb->freshVar();
-        cb->emit(z + " = zext i8 " + indexVar + " to i32");
-        indexVar = z;
-    }
+//   if (node.index->type == ast::BuiltInType::BYTE) {
+//         std::string z = cb->freshVar();
+//         cb->emit(z + " = zext i8 " + indexVar + " to i32");
+//         indexVar = z;
+//     }
+
     std::string expNewVar = node.exp->newVar;
      int baseoff = node.id->offset;
      std::string newbasePtrI32 = cb->freshVar();
@@ -96,16 +120,16 @@ auto len =(node.id->len);
     auto arrType = node.id->type;
    
 
-    std::string elemLLVM = output::changeType(arrType);
+    std::string typeLL = output::changeType(arrType);
 
     std::string basePtr = cb->freshVar();
     cb->emit(basePtr +
-        " = bitcast i32* " + newbasePtrI32 + " to " + elemLLVM + "*");
+        " = bitcast i32* " + newbasePtrI32 + " to " + typeLL + "*");
 
    
     std::string elemPtr = cb->freshVar();
     cb->emit(elemPtr +
-        " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
+        " = getelementptr " + typeLL + ", " + typeLL + "* " +
         basePtr + ", i32 " + indexVar);
 
   
@@ -122,8 +146,8 @@ auto len =(node.id->len);
     }
 
    
-    cb->emit("store " + elemLLVM + " " + expNewVar + ", " +
-                    elemLLVM + "* " + elemPtr + ", align 4");
+    cb->emit("store " + typeLL + " " + expNewVar + ", " +
+                    typeLL + "* " + elemPtr + ", align 4");
 
 
 
@@ -164,8 +188,10 @@ auto len =(node.id->len);
     void codeGvisitor::visit(Num& node) {
             node.newVar=std::to_string(node.value);
     }
-    void codeGvisitor::visit(NumB& node) {node.newVar=std::to_string(node.value);}
-    void codeGvisitor::visit(String& node) {  node.newVar=(node.value);}
+    void codeGvisitor::visit(NumB& node)
+     {node.newVar=std::to_string(node.value);}
+    void codeGvisitor::visit(String& node)
+     {  node.newVar=(node.value);}
     void codeGvisitor::visit(Bool& node) 
     {
          if(node.value==true)
@@ -457,7 +483,7 @@ node.newVar=label;
 // %element   = load i32, i32* %print_ptr                        ; ② fetch value
 
 //  cb->emit(elemPtr +
-     //   " = getelementptr " + elemLLVM + ", " + elemLLVM + "* " +
+     //   " = getelementptr " + typeLL + ", " + typeLL + "* " +
      //   basePtr + ", i32 " + indexVar);
 
 
