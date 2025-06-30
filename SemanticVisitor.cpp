@@ -219,7 +219,6 @@ void SemanticVisitor::visit(Statements& node) {
 void SemanticVisitor::visit(ExpList& node) {
     for (auto& exp : node.exps) {
         exp->accept(*this);
-        std::cerr << ("[DEBUG] type of arg is %d\n",exp->type);
     }
 }
 
@@ -237,8 +236,11 @@ void SemanticVisitor::visit(Call& node) {
     BuiltInType retType = sig->returnType;
     std::vector<BuiltInType> paramTypes = sig->paramTypes;
 
+    node.args->accept(*this);
+
     // START: HANDLING THE PRINT FUNCTION
     if (node.func_id->value == "print") {
+
         if (node.args->exps.size() != 1) {
             return;
         }
