@@ -199,7 +199,6 @@ void codeGvisitor::visit(Call& node) {
 
     for (auto& arg : node.args->exps) {
         arg->accept(*this);
-        std::cerr << output::changeType(arg->type);
         argValues.push_back(arg->newVar);
         argTypes.push_back(output::changeType(arg->type));  // get LLVM type
     }

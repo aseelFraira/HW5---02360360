@@ -2,6 +2,7 @@
 #include "output.hpp"
 #include <memory>
 #include <cassert>
+#include "iostream"
 using namespace ast;
 
 //TODO: we must enforce handling string only in PRINT!
@@ -218,7 +219,7 @@ void SemanticVisitor::visit(Statements& node) {
 void SemanticVisitor::visit(ExpList& node) {
     for (auto& exp : node.exps) {
         exp->accept(*this);
-        printf("[DEBUG] type of arg is %d\n",exp->type);
+        std::cerr << ("[DEBUG] type of arg is %d\n",exp->type);
     }
 }
 
