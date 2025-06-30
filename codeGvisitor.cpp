@@ -434,7 +434,7 @@ codeGvisitor::widenByte(indexVar, node.index->type);
     else{
         node.newVar="false";
     }
-    }
+   std::cerr<<"what is node.newVar: "<<node.newVar<<std::endl; }
     void codeGvisitor::visit(ID& node)
     {//today
     if (node.offset < 0) {
