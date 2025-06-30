@@ -202,7 +202,7 @@ void codeGvisitor::visit(Call& node) {
         argTypes.push_back(output::changeType(arg->type));
         if (arg->type == ast::BuiltInType::STRING) {//
             cb->emitString(arg->newVar);
-            std::string ptrVar = cb->freshVar();//
+            std::string ptrVar = cb->freshVar();
             int len = arg->newVar.length() + 1;
             cb->emit(ptrVar + " = getelementptr [" + std::to_string(len) + " x i8], [" +
                     std::to_string(len) + " x i8]* " + arg->newVar + ", i32 0, i32 0");
@@ -215,6 +215,7 @@ void codeGvisitor::visit(Call& node) {
             argValues.push_back(promotedVar);
         }else{
             argValues.push_back(arg->newVar);
+            std::cout << "[Debug] new Var is " <<arg->newVar <<std::endl;
         }
     }
 
