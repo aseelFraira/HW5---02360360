@@ -196,12 +196,29 @@ void codeGvisitor::visit(Call& node) {
     std::vector<std::string> argValues;
     std::vector<std::string> argTypes;
 
-
-    for (auto& arg : node.args->exps) {
-        arg->accept(*this);
-        argValues.push_back(arg->newVar);
-        argTypes.push_back(output::changeType(arg->type));  // get LLVM type
+    node.args->accept(*this);
+    for (int i = 0; i < node.args->exps.size(); i++) {
+        auto arg = node.args->exps[i];
+        if (arg->type == ast::BuiltInType::STRING) {
+            cb->emitString(arg->newVar);
+            std::string ptrVar = cb->freshVar();
+            int len = arg->newVar.length() + 1;
+            cb->emit(ptrVar + " = getelementptr [" + std::to_string(len) + " x i8], [" +
+                    std::to_string(len) + " x i8]* " + arg->newVar + ", i32 0, i32 0");
+            argValues.push_back(ptrVar);
+        }
+        else if (arg->type == ast::BuiltInType::BYTE &&
+                 node.typesOfArgs[i] == ast::BuiltInType::INT) {
+            std::string promotedVar = cb->freshVar();
+            cb->emit(promotedVar + " = zext i8 " + arg->newVar + " to i32");
+            argValues.push_back(promotedVar);
+        }else{
+            argValues.push_back(arg->newVar);
+        }
     }
+
+
+
     std::string funcName = node.func_id->value;
     BuiltInType returnType = node.type;
     std::string llvmRetType = output::changeType(returnType);
@@ -211,6 +228,7 @@ void codeGvisitor::visit(Call& node) {
     std::string resultVar;
 
     std::string argsJoined;
+
     for (size_t i = 0; i < argValues.size(); ++i) {
         argsJoined += argTypes[i] + " " + argValues[i];
         if (i < argValues.size() - 1)

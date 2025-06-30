@@ -313,6 +313,8 @@ std::string beginL;
         // List of arguments as expressions
         std::shared_ptr<ExpList> args;
 
+        std::vector<BuiltInType> typesOfArgs;
+
         // Constructor that receives the function identifier and the list of arguments
         Call(std::shared_ptr<ID> func_id, std::shared_ptr<ExpList> args);
 
