@@ -202,11 +202,11 @@ void codeGvisitor::visit(Call& node) {
         arg->accept(*this);
         argTypes.push_back(output::changeType(arg->type));
         if (arg->type == ast::BuiltInType::STRING) {//
-            cb->emitString(arg->newVar);
+            string strArray = cb->emitString(arg->newVar);
             std::string ptrVar = cb->freshVar();
             int len = arg->newVar.length() + 1;
             cb->emit(ptrVar + " = getelementptr [" + std::to_string(len) + " x i8], [" +
-                    std::to_string(len) + " x i8]* " + arg->newVar + ", i32 0, i32 0");
+                    std::to_string(len) + " x i8]* " + strArray + ", i32 0, i32 0");
             argValues.push_back(ptrVar);
         }
         else if (arg->type == ast::BuiltInType::BYTE &&
