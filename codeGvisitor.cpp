@@ -553,7 +553,7 @@ void codeGvisitor::visit(And& node) {
     cb->emit("br label " + joinLabel);
 
     // ---- Join block ----
-    cb->emit(falseLabel);
+    cb->emitLabel(falseLabel);
     cb->emitLabel(joinLabel);
     cb->emit(resultVar + " = phi i1 [ false, " + falseLabel + " ], [ " + rightVar + ", " + rightIncomingLabel + " ]");
 
