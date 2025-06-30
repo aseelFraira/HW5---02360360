@@ -196,8 +196,9 @@ void codeGvisitor::visit(Call& node) {
     std::vector<std::string> argValues;
     std::vector<std::string> argTypes;
 
-    node.args->accept(*this);
     for (int i = 0; i < node.args->exps.size(); i++) {
+        node.args->accept(*this);
+
         auto arg = node.args->exps[i];
         if (arg->type == ast::BuiltInType::STRING) {
             cb->emitString(arg->newVar);
