@@ -218,6 +218,7 @@ void SemanticVisitor::visit(Statements& node) {
 void SemanticVisitor::visit(ExpList& node) {
     for (auto& exp : node.exps) {
         exp->accept(*this);
+        printf("[DEBUG] type of arg is %d\n",exp->type);
     }
 }
 

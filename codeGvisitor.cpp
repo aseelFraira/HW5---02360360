@@ -196,6 +196,7 @@ void codeGvisitor::visit(Call& node) {
     std::vector<std::string> argValues;
     std::vector<std::string> argTypes;
 
+
     for (auto& arg : node.args->exps) {
         arg->accept(*this);
         std::cerr << output::changeType(arg->type);
