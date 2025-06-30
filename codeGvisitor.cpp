@@ -515,6 +515,7 @@ void codeGvisitor::visit(Not& node) {
 }
 
 void codeGvisitor::visit(And& node) {
+
     std::string falseLabel = cb->freshLabel();   // Short-circuit if left is false
     std::string rightLabel = cb->freshLabel();   // Evaluate right side if left is true
     std::string joinLabel = cb->freshLabel();    // Final merge point
@@ -552,6 +553,7 @@ void codeGvisitor::visit(And& node) {
     cb->emit("br label " + joinLabel);
 
     // ---- Join block ----
+    cb->emit(falseLabel);
     cb->emitLabel(joinLabel);
     cb->emit(resultVar + " = phi i1 [ false, " + falseLabel + " ], [ " + rightVar + ", " + rightIncomingLabel + " ]");
 
