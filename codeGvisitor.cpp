@@ -553,7 +553,6 @@ void codeGvisitor::visit(And& node) {
     cb->emit("br label " + joinLabel);
 
     // ---- Join block ----
-    cb->emitLabel(falseLabel);
     cb->emitLabel(joinLabel);
     cb->emit(resultVar + " = phi i1 [ false, " + falseLabel + " ], [ " + rightVar + ", " + rightIncomingLabel + " ]");
 
@@ -561,63 +560,53 @@ void codeGvisitor::visit(And& node) {
     node.newVar = resultVar;
     cb->emit(""); // blank line for clarity
 }
-    void codeGvisitor::visit(Or& node) {
-        //same thing as and but we alter the short circut evaluation 
-    std::string rightSideLabel = cb->freshLabel();
-    std::string e5tesarL = cb->freshLabel();
- 
-  
-       std::string finishL = cb->freshLabel();
-    node.finishL = finishL;
-    // Generate code for first operand
+void codeGvisitor::visit(Or& node) {
+    std::string evalRightLabel = cb->freshLabel();  // where to go if left is false
+    std::string shortCircuitLabel = cb->freshLabel(); // if left is true (shortcut)
+    std::string joinLabel = cb->freshLabel(); // merge point
+    std::string resultVar = cb->freshVar();
+
+    node.finishL = joinLabel;
+
+    // Evaluate left side
     node.left->accept(*this);
-     node.right->accept(*this);
-    std::string leftsideNewVar = node.left->newVar;
-  
+    std::string leftVar = node.left->newVar;
 
-    cb->emit("br i1 " + leftsideNewVar + ", label " + e5tesarL + ", label " + rightSideLabel);
+    // If left is true, short-circuit to result true
+    cb->emit("br i1 " + leftVar + ", label " + shortCircuitLabel + ", label " + evalRightLabel);
 
-    
- 
-   
-  
-    
-   if (auto n = dynamic_cast<ast::Or*>(node.right.get())) {
-        rightSideLabel = n->finishL;
-    } 
-    else if (auto n = dynamic_cast<ast::Not*>(node.right.get())) {
-      rightSideLabel = n->beginL;}
-    else if (auto n = dynamic_cast<ast::RelOp*>(node.right.get())) {
-        rightSideLabel = n->beginL;
-    } 
-    else if (auto n = dynamic_cast<ast::And*>(node.right.get())) {
-        rightSideLabel = n->finishL;
-    } 
-     cb->emitLabel(rightSideLabel);
-    //I dont know if we need this 
-    // } else if (auto funcNode = dynamic_cast<ast::Call*>(node.right.get())) {
-    //     rightSideLabel = funcNode->beginL;
-    // }
+    // ---- Right-hand side ----
+    cb->emitLabel(evalRightLabel);
+    node.right->accept(*this);
+    std::string rightVar = node.right->newVar;
 
-   
-    cb->emit("br label " + finishL);
-
-
-
-    cb->emitLabel(e5tesarL);
-    cb->emit("br label " + finishL);
- 
-    std::string finishnewVar = cb->freshVar();
-    std::string seconnewVar = node.right->newVar;
-    cb->emitLabel(finishL);
-    cb->emit(finishnewVar + " = phi i1 [ true, " + e5tesarL + " ], [ " + seconnewVar + ", " + rightSideLabel + " ]");
-    
-   
-    node.newVar = finishnewVar;
-    cb->emit("");
-
-
+    // Determine the label where right-side value comes from (for phi)
+    std::string rightLabel = evalRightLabel;
+    if (auto n = dynamic_cast<ast::Or*>(node.right.get())) {
+        rightLabel = n->finishL;
+    } else if (auto n = dynamic_cast<ast::Not*>(node.right.get())) {
+        rightLabel = n->beginL;
+    } else if (auto n = dynamic_cast<ast::RelOp*>(node.right.get())) {
+        rightLabel = n->beginL;
+    } else if (auto n = dynamic_cast<ast::And*>(node.right.get())) {
+        rightLabel = n->finishL;
     }
+
+    // After right-side, jump to join
+    cb->emit("br label " + joinLabel);
+
+    // ---- Short-circuit true ----
+    cb->emitLabel(shortCircuitLabel);
+    cb->emit("br label " + joinLabel);
+
+    // ---- Join block ----
+    cb->emitLabel(joinLabel);
+    cb->emit(resultVar + " = phi i1 [ true, " + shortCircuitLabel + " ], [ " + rightVar + ", " + rightLabel + " ]");
+
+    node.newVar = resultVar;
+    cb->emit(""); // spacing
+}
+
 void codeGvisitor::visit(ArrayDereference& node) {
     node.id->accept(*this);
   auto type=node.id->type;
