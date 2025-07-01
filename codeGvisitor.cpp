@@ -121,6 +121,7 @@ void codeGvisitor::visit(FuncDecl& node) {
 }
 ///////////////////////////////VarDecl//////////////////////////////////////////
 void codeGvisitor::visit(VarDecl& node) {
+    node.id->accept(*this);
     std::string llvmType = output::changeType(node.id->type);
 
     std::string ptrVar = cb->freshVar();
