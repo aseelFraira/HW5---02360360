@@ -415,30 +415,32 @@ void codeGvisitor::visit(Statements& node){
 
     void codeGvisitor::visit(ExpList& node) {}//done
 void codeGvisitor::visit(ast::ArrayAssign &node) {
-    // Visit sub-nodes to evaluate their values
+    // Visit child nodes
     node.id->accept(*this);
     node.index->accept(*this);
-    node.exp->accept(*this);// accepting everything
-    std::string indexVar = node.index->newVar;
-    codeGvisitor::widenByte(indexVar, node.index->type);
-    auto len =(node.id->len);
-    emitOobCheck(indexVar, len);
+    node.exp->accept(*this);
 
-    // Widen BYTE index to i32 if needed (for pointer arithmetic and OOB check)
+    std::string indexVar = node.index->newVar;
+
+    // Widen index if it's a BYTE (needed for GEP and OOB check)
     if (node.index->type == ast::BuiltInType::BYTE) {
         std::string zextIndex = cb->freshVar();
         cb->emit(zextIndex + " = zext i8 " + indexVar + " to i32");
         indexVar = zextIndex;
     }
 
-    // Emit out-of-bounds check
-    emitOobCheck(indexVar, node.id->len);
+    // Emit out-of-bounds check and jump to continuation label
+    std::string okLabel = emitOobCheck(indexVar, node.id->len);
+    // DO NOT emit: cb->emit("br label " + okLabel); — emitOobCheck already ends with it
 
+    // --- Now we are in the okLabel block ---
+    // No need to emit the label again (emitOobCheck already did)
+
+    // Handle type adjustment of RHS expression
     std::string valueVar = node.exp->newVar;
-    ast::BuiltInType elemType = node.id->type; // type of array elements
+    ast::BuiltInType elemType = node.id->type;
     std::string llvmElemType = output::changeType(elemType);
 
-    // Cast RHS if needed
     if (node.exp->type == ast::BuiltInType::BYTE && elemType == ast::BuiltInType::INT) {
         std::string widened = cb->freshVar();
         cb->emit(widened + " = zext i8 " + valueVar + " to i32");
@@ -449,20 +451,18 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
         valueVar = truncated;
     }
 
-    // Get the base address of the array from %local_vars
+    // Access array element pointer
     int offset = node.id->offset;
     std::string basePtrI32 = cb->freshVar();
     cb->emit(basePtrI32 + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(offset));
 
-    // Bitcast base to element type*
     std::string baseTypedPtr = cb->freshVar();
     cb->emit(baseTypedPtr + " = bitcast i32* " + basePtrI32 + " to " + llvmElemType + "*");
 
-    // Get pointer to the specific array element
     std::string elemPtr = cb->freshVar();
     cb->emit(elemPtr + " = getelementptr " + llvmElemType + ", " + llvmElemType + "* " + baseTypedPtr + ", i32 " + indexVar);
 
-    // Store value into array element
+    // Store the value
     cb->emit("store " + llvmElemType + " " + valueVar + ", " + llvmElemType + "* " + elemPtr + ", align 4");
 }
     void codeGvisitor::visit(ast::Funcs& node)
