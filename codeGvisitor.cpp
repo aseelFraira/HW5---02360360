@@ -223,6 +223,7 @@ void codeGvisitor::visit(Call& node) {
     for (int i = 0; i < node.args->exps.size(); i++) {
         const auto &arg = node.args->exps[i];
         arg->accept(*this);
+        std::cerr << "The value is " <<arg->newVar <<std::endl;
         argTypes.push_back(output::changeType(arg->type));
         if (arg->type == ast::BuiltInType::STRING) {//
             string strArray = cb->emitString(arg->newVar);
