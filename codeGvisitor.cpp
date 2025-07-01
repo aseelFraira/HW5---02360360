@@ -127,7 +127,6 @@ void codeGvisitor::visit(VarDecl& node) {
              std::to_string(node.id->offset));
 
     std::string finalPtr = ptrVar;
-    std::cerr << "[DEBUG]The len of array is " << node.id->len << std::endl;
 
 
     // If we're dealing with a smaller type (like bool or byte), bitcast to the correct pointer type
@@ -419,6 +418,7 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
     node.id->accept(*this);
     node.index->accept(*this);
     node.exp->accept(*this);
+    std::cerr << "[DEBUG]The len of array is " << node.exp->len << std::endl;
 
     std::string indexVar = node.index->newVar;
 
