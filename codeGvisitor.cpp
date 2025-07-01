@@ -119,6 +119,7 @@ void codeGvisitor::visit(FuncDecl& node) {
 }
 ///////////////////////////////VarDecl//////////////////////////////////////////
 void codeGvisitor::visit(VarDecl& node) {
+    node.id->accept(*this);
     std::string llvmType = output::changeType(node.id->type);
     std::string ptrVar = cb->freshVar();
 
@@ -141,14 +142,20 @@ void codeGvisitor::visit(VarDecl& node) {
                      llvmType + "* " + finalPtr + ", i32 " + std::to_string(i));
             cb->emit("store " + llvmType + " 0, " + llvmType + "* " + elemPtr);
         }
-    }
-    if (node.init_exp) {
-        node.init_exp->accept(*this);
-        std::string initValueVar = node.init_exp->newVar;
-        cb->emit("store " + llvmType + " " + initValueVar + ", " + llvmType + "* " + finalPtr);
-    } else {
-        std::string defaultValue = (node.id->type == BuiltInType::BOOL) ? "false" : "0";
-        cb->emit("store " + llvmType + " " + defaultValue + ", " + llvmType + "* " + finalPtr);
+    }else {
+        if (node.init_exp) {
+            node.init_exp->accept(*this);
+            std::string initValueVar = node.init_exp->newVar;
+            cb->emit(
+                    "store " + llvmType + " " + initValueVar + ", " + llvmType +
+                    "* " + finalPtr);
+        } else {
+            std::string defaultValue = (node.id->type == BuiltInType::BOOL)
+                                       ? "false" : "0";
+            cb->emit(
+                    "store " + llvmType + " " + defaultValue + ", " + llvmType +
+                    "* " + finalPtr);
+        }
     }
 }
 ///////////////////////////////Return///////////////////////////////////////////
