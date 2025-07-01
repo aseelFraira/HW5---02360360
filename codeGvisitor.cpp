@@ -119,29 +119,31 @@ void codeGvisitor::visit(FuncDecl& node) {
 }
 ///////////////////////////////VarDecl//////////////////////////////////////////
 void codeGvisitor::visit(VarDecl& node) {
-
     std::string llvmType = output::changeType(node.id->type);
-
     std::string ptrVar = cb->freshVar();
+
+    // Always compute GEP from %local_vars, which is i32*
     cb->emit(ptrVar + " = getelementptr i32, i32* %local_vars, i32 " +
              std::to_string(node.id->offset));
 
+    std::string finalPtr = ptrVar;
 
-    // Handle initialization
+    // If we're dealing with a smaller type (like bool or byte), bitcast to the correct pointer type
+    if (llvmType == "i1" || llvmType == "i8") {
+        finalPtr = cb->freshVar();
+        cb->emit(finalPtr + " = bitcast i32* " + ptrVar + " to " + llvmType + "*");
+    }
+
     if (node.init_exp) {
-        // Visit the initializer expression and get the result value
         node.init_exp->accept(*this);
         std::string initValueVar = node.init_exp->newVar;
-        cb->emit("store " + llvmType + " " + initValueVar + ", " + llvmType + "* " + ptrVar);
+        cb->emit("store " + llvmType + " " + initValueVar + ", " + llvmType + "* " + finalPtr);
     } else {
-        // No initializer — emit default value based on type
-        if (node.id->type == BuiltInType::INT || node.id->type == BuiltInType::BYTE) {
-            cb->emit("store " + llvmType + " 0, " + llvmType + "* " + ptrVar);
-        } else if (node.id->type == BuiltInType::BOOL) {
-            cb->emit("store " + llvmType + " false, " + llvmType + "* " + ptrVar);
-        }
+        std::string defaultValue = (node.id->type == BuiltInType::BOOL) ? "false" : "0";
+        cb->emit("store " + llvmType + " " + defaultValue + ", " + llvmType + "* " + finalPtr);
     }
 }
+
 ///////////////////////////////Return///////////////////////////////////////////
 void codeGvisitor::visit(Return& node) {
     if (currentReturnTypeFunc == BuiltInType::VOID) {
