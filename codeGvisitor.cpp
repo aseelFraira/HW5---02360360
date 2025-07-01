@@ -127,6 +127,8 @@ void codeGvisitor::visit(VarDecl& node) {
              std::to_string(node.id->offset));
 
     std::string finalPtr = ptrVar;
+    std::cerr << "[DEBUG]The len of array is " << node.id->len << std::endl;
+
 
     // If we're dealing with a smaller type (like bool or byte), bitcast to the correct pointer type
     if (llvmType == "i1" || llvmType == "i8") {
@@ -429,7 +431,6 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
 
     // Emit out-of-bounds check and jump to continuation label
     std::string okLabel = emitOobCheck(indexVar, node.id->len);
-    std::cerr << "[DEBUG]The len of array is " << node.id->len << std::endl;
 
     // DO NOT emit: cb->emit("br label " + okLabel); — emitOobCheck already ends with it
 
