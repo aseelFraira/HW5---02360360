@@ -71,33 +71,46 @@ void codeGvisitor::visit(FuncDecl& node) {
     // Emit function entry label
     cb->emitLabel("entry");
 
-    // Allocate unified local variable space using precomputed offset
+    // Allocate local variable space
     if (node.offset > 0) {
         cb->emit("%local_vars = alloca i32, i32 " + std::to_string(node.offset));
     }
 
-    // Emit code for the function body
+    // 🌟 Store each parameter in local_vars
+    for (auto& formal : node.formals->formals) {
+        const std::string& name = formal->id->value;
+        int offset = formal->id->offset;  // this should be set in semantic phase
+        std::string llvmType = output::changeType(formal->id->type);
+
+        // %ptr = getelementptr i32, i32* %local_vars, i32 offset
+        std::string ptrVar = cb->freshVar();
+        cb->emit(ptrVar + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(offset));
+
+        // %typed_ptr = bitcast i32* %ptr to TYPE*
+        std::string typedPtr = cb->freshVar();
+        cb->emit(typedPtr + " = bitcast i32* " + ptrVar + " to " + llvmType + "*");
+
+        // store TYPE %param, TYPE* %typed_ptr
+        cb->emit("store " + llvmType + " %" + name + ", " + llvmType + "* " + typedPtr);
+    }
+
+    // Emit function body
     node.body->accept(*this);
 
-    // we need to check if it has a return statment
-    // Check if the last statement is NOT a return
+    // Ensure a return is always present
     if (node.body->statements.empty() ||
         !std::dynamic_pointer_cast<Return>(node.body->statements.back())) {
-
-        ast::BuiltInType returnType = returnTypeNode->type;
-        std::string llvmType = output::changeType(returnType);
-
-        if (returnType == ast::BuiltInType::VOID) {
+        std::string llvmType = output::changeType(currentReturnTypeFunc);
+        if (currentReturnTypeFunc == ast::BuiltInType::VOID) {
             cb->emit("ret void");
         } else {
-            std::string defaultValue = (returnType == ast::BuiltInType::BOOL) ? "false" : "0";
+            std::string defaultValue = (currentReturnTypeFunc == ast::BuiltInType::BOOL) ? "false" : "0";
             cb->emit("ret " + llvmType + " " + defaultValue);
         }
     }
 
     cb->emit("}");
     cb->emit("");
-
 }
 ///////////////////////////////VarDecl//////////////////////////////////////////
 void codeGvisitor::visit(VarDecl& node) {
