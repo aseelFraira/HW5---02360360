@@ -418,9 +418,11 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
     // Visit sub-nodes to evaluate their values
     node.id->accept(*this);
     node.index->accept(*this);
-    node.exp->accept(*this);
-
+    node.exp->accept(*this);// accepting everything
     std::string indexVar = node.index->newVar;
+    codeGvisitor::widenByte(indexVar, node.index->type);
+    auto len =(node.id->len);
+    emitOobCheck(indexVar, len);
 
     // Widen BYTE index to i32 if needed (for pointer arithmetic and OOB check)
     if (node.index->type == ast::BuiltInType::BYTE) {
