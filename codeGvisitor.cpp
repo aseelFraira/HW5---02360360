@@ -412,7 +412,6 @@ codeGvisitor::widenByte(indexVar, node.index->type);
     void codeGvisitor::visit(ast::Formal &node) {
     node.id->accept(*this);
           std::string funcp = output::changeType(node.id->type) + " %" + node.id->value;
-          std::cout << "[DEBUG] print formals" <<std::endl;
    cb->emit(funcp);
     }//today
     void codeGvisitor::visit(ast::Formals &node) {
@@ -441,7 +440,7 @@ codeGvisitor::widenByte(indexVar, node.index->type);
     else{
         node.newVar="false";
     }
-   std::cerr<<"what is node.newVar: "<<node.newVar<<std::endl; }
+ }
     void codeGvisitor::visit(ID& node)
     {//today
     if (node.offset < 0) {
