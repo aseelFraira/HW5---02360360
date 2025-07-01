@@ -134,7 +134,14 @@ void codeGvisitor::visit(VarDecl& node) {
         finalPtr = cb->freshVar();
         cb->emit(finalPtr + " = bitcast i32* " + ptrVar + " to " + llvmType + "*");
     }
-
+    if (node.id->len > 1 && node.init_exp == nullptr) {
+        for (int i = 0; i < node.id->len; ++i) {
+            std::string elemPtr = cb->freshVar();
+            cb->emit(elemPtr + " = getelementptr " + llvmType + ", " +
+                     llvmType + "* " + finalPtr + ", i32 " + std::to_string(i));
+            cb->emit("store " + llvmType + " 0, " + llvmType + "* " + elemPtr);
+        }
+    }
     if (node.init_exp) {
         node.init_exp->accept(*this);
         std::string initValueVar = node.init_exp->newVar;
