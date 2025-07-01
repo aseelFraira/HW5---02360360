@@ -824,14 +824,15 @@ std::string codeGvisitor::emitOobCheck(const std::string& idxVar,
     std::string isNeg = cb->freshVar();
     cb->emit(isNeg + " = icmp slt i32 " + idxVar + ", 0");
 
-    /* idx < length ? */
     std::string inRange = cb->freshVar();
-    cb->emit(inRange + " = icmp slt i32 " + idxVar + ", "
-             + std::to_string(length));
+    cb->emit(inRange + " = icmp slt i32 " + idxVar + ", " + std::to_string(length));
 
-    /* ok = !isNeg  &&  inRange */
+    std::string notNeg = cb->freshVar();
+    cb->emit(notNeg + " = xor i1 " + isNeg + ", true");
+
     std::string ok = cb->freshVar();
-    cb->emit(ok + " = and i1 " + inRange + ", xor i1 " + isNeg + ", true");
+    cb->emit(ok + " = and i1 " + inRange + ", " + notNeg);
+
 
     /* conditional branch */
     cb->emit("br i1 " + ok + ", label " + okLabel + ", label " + errLabel);
