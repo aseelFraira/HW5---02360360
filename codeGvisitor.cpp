@@ -841,7 +841,7 @@ std::string codeGvisitor::emitOobCheck(const std::string& idxVar,
     cb->emitLabel(errLabel);
     std::string msgPtr = cb->freshVar();
     cb->emit(msgPtr +
-        " = getelementptr [19 x i8], [20 x i8]* @.oob_str, i32 0, i32 0");
+        " = getelementptr [20 x i8], [20 x i8]* @.oob_str, i32 0, i32 0");
     cb->emit("call void @print(i8* " + msgPtr + ")");
     cb->emit("call void @exit(i32 1)");
     cb->emit("unreachable");
