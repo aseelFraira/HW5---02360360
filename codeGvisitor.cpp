@@ -414,77 +414,55 @@ void codeGvisitor::visit(Statements& node){
      }
 
     void codeGvisitor::visit(ExpList& node) {}//done
-    void codeGvisitor::visit(ast::ArrayAssign &node) {
-node.id->accept(*this);
+void codeGvisitor::visit(ast::ArrayAssign &node) {
+    // Visit sub-nodes to evaluate their values
+    node.id->accept(*this);
     node.index->accept(*this);
-    node.exp->accept(*this);// accepting everything 
-     std::string indexVar = node.index->newVar;
-auto len =(node.id->len);
- emitOobCheck(indexVar, len);
+    node.exp->accept(*this);
 
+    std::string indexVar = node.index->newVar;
 
-codeGvisitor::widenByte(indexVar, node.index->type);
-
-
-//TO DO : RE DO THE LENGTH IN THE ARRAY SO THE EMIT OOB FUNCTION COULD FUNCTION NORMALLY 
-//   if (node.index->type == ast::BuiltInType::BYTE) {
-//         std::string z = cb->freshVar();
-//         cb->emit(z + " = zext i8 " + indexVar + " to i32");
-//         indexVar = z;
-//     }
-
-    std::string expNewVar = node.exp->newVar;
-     int baseoff = node.id->offset;
-     std::string newbasePtrI32 = cb->freshVar();
-        cb->emit(newbasePtrI32 +
-                 " = getelementptr i32, i32* %local_vars, i32 " +
-                 std::to_string(baseoff));
-
-   
-    auto arrType = node.id->type;
-   
-
-    std::string typeLL = output::changeType(arrType);
-
-    std::string basePtr = cb->freshVar();
-    cb->emit(basePtr +
-        " = bitcast i32* " + newbasePtrI32 + " to " + typeLL + "*");
-
-   
-    std::string elemPtr = cb->freshVar();
-    cb->emit(elemPtr +
-        " = getelementptr " + typeLL + ", " + typeLL + "* " +
-        basePtr + ", i32 " + indexVar);
-
-  
-    if (node.exp->type == ast::BuiltInType::BYTE &&
-        arrType == ast::BuiltInType::INT) {
-        std::string rhsExt = cb->freshVar();
-        cb->emit(rhsExt + " = zext i8 " + expNewVar + " to i32");
-        expNewVar = rhsExt;
-    } else if (node.exp->type == ast::BuiltInType::INT &&
-               arrType == ast::BuiltInType::BYTE) {
-        std::string rhsTrunc = cb->freshVar();
-        cb->emit(rhsTrunc + " = trunc i32 " + expNewVar + " to i8");
-        expNewVar = rhsTrunc;
+    // Widen BYTE index to i32 if needed (for pointer arithmetic and OOB check)
+    if (node.index->type == ast::BuiltInType::BYTE) {
+        std::string zextIndex = cb->freshVar();
+        cb->emit(zextIndex + " = zext i8 " + indexVar + " to i32");
+        indexVar = zextIndex;
     }
 
-   
-    cb->emit("store " + typeLL + " " + expNewVar + ", " +
-                    typeLL + "* " + elemPtr + ", align 4");
+    // Emit out-of-bounds check
+    emitOobCheck(indexVar, node.id->len);
 
+    std::string valueVar = node.exp->newVar;
+    ast::BuiltInType elemType = node.id->type; // type of array elements
+    std::string llvmElemType = output::changeType(elemType);
 
+    // Cast RHS if needed
+    if (node.exp->type == ast::BuiltInType::BYTE && elemType == ast::BuiltInType::INT) {
+        std::string widened = cb->freshVar();
+        cb->emit(widened + " = zext i8 " + valueVar + " to i32");
+        valueVar = widened;
+    } else if (node.exp->type == ast::BuiltInType::INT && elemType == ast::BuiltInType::BYTE) {
+        std::string truncated = cb->freshVar();
+        cb->emit(truncated + " = trunc i32 " + valueVar + " to i8");
+        valueVar = truncated;
+    }
 
-//     idx  = code for index-expression            ; possibly zext to i32
-// rhs  = code for right-hand side expression  ; widen/trunc if needed
+    // Get the base address of the array from %local_vars
+    int offset = node.id->offset;
+    std::string basePtrI32 = cb->freshVar();
+    cb->emit(basePtrI32 + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(offset));
 
-// base = getelementptr i32, i32* %local_vars, i32 <arrayOffset>
-// elemPtr = bitcast i32* base to <elemTy>*      ; if you keep %local_vars
-// elemPtr = getelementptr <elemTy>, <elemTy>* elemPtr, i32 idx   ; ← ①
-// store <elemTy> rhs, <elemTy>* elemPtr, align 4                 ; ← ②
+    // Bitcast base to element type*
+    std::string baseTypedPtr = cb->freshVar();
+    cb->emit(baseTypedPtr + " = bitcast i32* " + basePtrI32 + " to " + llvmElemType + "*");
 
+    // Get pointer to the specific array element
+    std::string elemPtr = cb->freshVar();
+    cb->emit(elemPtr + " = getelementptr " + llvmElemType + ", " + llvmElemType + "* " + baseTypedPtr + ", i32 " + indexVar);
 
-    }//today
+    // Store value into array element
+    cb->emit("store " + llvmElemType + " " + valueVar + ", " + llvmElemType + "* " + elemPtr + ", align 4");
+}
     void codeGvisitor::visit(ast::Funcs& node)
      {for (std::size_t i = 0; i < node.funcs.size(); ++i) {
     node.funcs[i]->accept(*this);
@@ -712,17 +690,18 @@ void codeGvisitor::visit(Or& node) {
 }
 
 void codeGvisitor::visit(ArrayDereference& node) {
+
     node.id->accept(*this);
   auto type=node.id->type;
   auto changedType=output::changeType(type);
     node.index->accept(*this);
     std::string indexVar=node.index->newVar;
      codeGvisitor::widenByte(indexVar, node.index->type);
-//     if (node.index->type == ast::BuiltInType::BYTE) {           
-//     std::string z = cb->freshVar();                           
-//     cb->emit(z + " = zext i8 " + indexVar + " to i32");         
-//     indexVar = z;                                               
-// }
+        //     if (node.index->type == ast::BuiltInType::BYTE) {
+        //     std::string z = cb->freshVar();
+        //     cb->emit(z + " = zext i8 " + indexVar + " to i32");
+        //     indexVar = z;
+        // }
 auto len =(node.id->len);
  emitOobCheck(indexVar, len);
     int offset=node.id->offset;
