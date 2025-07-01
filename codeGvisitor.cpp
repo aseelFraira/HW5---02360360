@@ -699,11 +699,7 @@ void codeGvisitor::visit(ArrayDereference& node) {
     codeGvisitor::widenByte(indexVar, node.index->type);
 
     auto len = node.id->len;
-    std::string okLabel = emitOobCheck(indexVar, len);
-
-    // --- Jump to continuation label if bounds check passes ---
-    cb->emit("br label " + okLabel);
-    cb->emitLabel(okLabel);  // <- Needed!
+    std::string okLabel = emitOobCheck(indexVar, len);  // Already emits okLabel at end
 
     int offset = node.id->offset;
     std::string basePtrRaw = cb->freshVar();
