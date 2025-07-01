@@ -137,10 +137,17 @@ void codeGvisitor::visit(VarDecl& node) {
     }
     if (node.id->len > 1 && node.init_exp == nullptr) {
         for (int i = 0; i < node.id->len; ++i) {
-            std::string elemPtr = cb->freshVar();
-            cb->emit(elemPtr + " = getelementptr " + llvmType + ", " +
-                     llvmType + "* " + finalPtr + ", i32 " + std::to_string(i));
-            cb->emit("store " + llvmType + " 0, " + llvmType + "* " + elemPtr);
+            std::string slotPtr = cb->freshVar();
+            cb->emit(slotPtr + " = getelementptr i32, i32* %local_vars, i32 " +
+                     std::to_string(node.id->offset + i));
+            if (llvmType != "i32") {
+                std::string castPtr = cb->freshVar();
+                cb->emit(castPtr + " = bitcast i32* " + slotPtr + " to " +
+                         llvmType + "*");
+                cb->emit("store " + llvmType + " 0, " + llvmType + "* " + castPtr);
+            } else {
+                cb->emit("store i32 0, i32* " + slotPtr);
+            }
         }
     }else {
         if (node.init_exp) {
