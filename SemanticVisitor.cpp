@@ -67,6 +67,7 @@ void SemanticVisitor::visit(VarDecl& node) {
         isArray = true;
         declaredType = arrayType->type;
         node.len = arrayType->len;
+        node.id->len = arrayType->len;
     } else {
         output::errorMismatch(node.line);
         return;
