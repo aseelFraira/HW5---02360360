@@ -67,7 +67,6 @@ void SemanticVisitor::visit(VarDecl& node) {
         isArray = true;
         declaredType = arrayType->type;
         node.len = arrayType->len;
-        std::cerr << "[DEBUG]The len of array is " << arrayType->len << std::endl;
         node.id->len = arrayType->len;
     } else {
         output::errorMismatch(node.line);

@@ -429,6 +429,8 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
 
     // Emit out-of-bounds check and jump to continuation label
     std::string okLabel = emitOobCheck(indexVar, node.id->len);
+    std::cerr << "[DEBUG]The len of array is " << node.id->len << std::endl;
+
     // DO NOT emit: cb->emit("br label " + okLabel); — emitOobCheck already ends with it
 
     // --- Now we are in the okLabel block ---
