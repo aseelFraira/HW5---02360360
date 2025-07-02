@@ -417,7 +417,6 @@ void SemanticVisitor::visit(ArrayDereference &node) {
         output::errorMismatch(node.line);
         return;
     }
-
     node.type = arrInfo->type;
 }
 

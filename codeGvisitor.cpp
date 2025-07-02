@@ -412,14 +412,22 @@ void codeGvisitor::visit(Statements& node){
 }
 ////////////////////////////////////////////////////////////////////////////////
 void codeGvisitor::visit(Assign& node)
-     { 
+     {
     node.exp->accept(*this);
+    node.id->accept(*this);
+    std::string arrayOffReg = cb->freshVar();
     auto expNewVar = node.exp->newVar;
+    cb->emit(arrayOffReg + " = add i32 0, 0");
+
+    if(auto isArray = std::dynamic_pointer_cast<ArrayDereference>(node.exp)){
+        cb->emit(arrayOffReg + " = add i32 0, " + isArray->index->newVar);
+    }
 
    
     int off = node.id->offset; 
     std::string offPoi = cb->freshVar();
-         cb->emit(offPoi + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(off));
+    cb->emit(offPoi + " = add i32 " + offPoi + ", " + arrayOffReg);
+    cb->emit(offPoi + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(off));
 
   
     std::string tyoechanged = output::changeType(node.exp->type); 
