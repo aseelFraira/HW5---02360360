@@ -179,7 +179,6 @@ void codeGvisitor::visit(VarDecl& node) {
 
 // Optionally set newVar so other code can refer to it
     node.id->newVar = debug;
-    printWithStars({node.id->newVar});
 
 
 
@@ -467,6 +466,7 @@ void codeGvisitor::visit(ExpList& node) {}//done
 ////////////////////////////////////////////////////////////////////////////////
 void codeGvisitor::visit(ast::ArrayAssign &node) {
     // Visit child nodes
+    printWithStars({node.exp->newVar});
 
     node.id->accept(*this);
     node.index->accept(*this);
