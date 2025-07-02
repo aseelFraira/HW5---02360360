@@ -174,10 +174,6 @@ void codeGvisitor::visit(VarDecl& node) {
                     "* " + finalPtr);
         }
     }
-    std::string debug = cb->freshVar();
-    cb->emit(debug + " = load " + llvmType + ", " + llvmType + "* " + finalPtr);
-    printWithStars({debug});
-
 
 }
 ///////////////////////////////Return///////////////////////////////////////////
@@ -477,6 +473,7 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
         cb->emit(zextIndex + " = zext i8 " + indexVar + " to i32");
         indexVar = zextIndex;
     }
+    printWithStars({node.exp->newVar});
 
     // Emit out-of-bounds check and jump to continuation label
     std::string okLabel = emitOobCheck(indexVar, node.id->len);
