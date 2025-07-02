@@ -576,6 +576,7 @@ void codeGvisitor::visit(ID& node)
     // Local variables (from local_vars array)
     const int offset = node.offset;
     const std::string ltype =output::changeType(node.type);
+    std::cerr << "The offset is "  << offset << std::endl;
 
 
     // Compute address of the variable: %addr = getelementptr ...
@@ -589,6 +590,8 @@ void codeGvisitor::visit(ID& node)
     // Load the value from memory: %val = load ...
     std::string newV = cb->freshVar();
     cb->emit(newV + " = load " + ltype + ", " + ltype + "* " + cpointer + ", align 4");
+
+
 
     // Set the result
     node.newVar = newV;
