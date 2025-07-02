@@ -17,7 +17,7 @@ declare void @exit(i32)
 @.int_specifier = constant [4 x i8] c"%d\0A\00"
 @.str_specifier = constant [4 x i8] c"%s\0A\00"
 @.oob_str = private unnamed_addr constant [20 x i8] c"Error out of bounds\00", align 1
-@.stars = private unnamed_addr constant [19 x i8] c"*****************\0A\00"
+@.stars = private unnamed_addr constant [19 x i8] c"The index is****\0A\00"
 
 define i32 @readi(i32) {
     %ret_val = alloca i32
@@ -743,7 +743,7 @@ void codeGvisitor::visit(ArrayDereference& node) {
 
     auto len = node.id->len;
     std::string okLabel = emitOobCheck(indexVar, len);  // Already emits okLabel at end
-    printWithStars({indexVar});
+
     int offset = node.id->offset;
     std::string basePtrRaw = cb->freshVar();
     cb->emit(basePtrRaw + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(offset));
@@ -878,10 +878,6 @@ void codeGvisitor::printWithStars(const std::vector<std::string> &regs) {
         cb->emit("call void @printi(i32 " + reg + ")");
     }
 
-    // Print after
-    std::string tmpAfter = cb->freshVar();
-    cb->emit(tmpAfter + " = getelementptr [" + std::to_string(starLineLen) + " x i8], [" +
-             std::to_string(starLineLen) + " x i8]* @" + starLineName + ", i32 0, i32 0");
-    cb->emit("call void @print(i8* " + tmpAfter + ")");
+
 }
 
