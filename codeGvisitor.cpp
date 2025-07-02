@@ -441,6 +441,7 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
     node.exp->accept(*this);
 
     std::string reg = cb->freshVar();
+    std::cerr <<"The index is " << node.index->newVar;
     cb->emit(reg + " = add i32 0, " + node.index->newVar);
     node.index->newVar = reg;
 
