@@ -165,7 +165,6 @@ void codeGvisitor::visit(VarDecl& node) {
                     "store " + llvmType + " " + initValueVar + ", " + llvmType +
                     "* " + finalPtr);
 
-            printWithStars({initValueVar});
 
         } else {
             std::string defaultValue = (node.id->type == BuiltInType::BOOL)
@@ -175,6 +174,11 @@ void codeGvisitor::visit(VarDecl& node) {
                     "* " + finalPtr);
         }
     }
+    std::string debug = cb->freshVar();
+    cb->emit(debug + " = load " + llvmType + ", " + llvmType + "* " + finalPtr);
+    printWithStars({debug});
+
+
 }
 ///////////////////////////////Return///////////////////////////////////////////
 void codeGvisitor::visit(Return& node) {
