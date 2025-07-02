@@ -163,6 +163,7 @@ void codeGvisitor::visit(VarDecl& node) {
             cb->emit(
                     "store " + llvmType + " " + initValueVar + ", " + llvmType +
                     "* " + finalPtr);
+            printWithStars({initValueVar});
         } else {
             std::string defaultValue = (node.id->type == BuiltInType::BOOL)
                                        ? "false" : "0";
@@ -745,7 +746,6 @@ void codeGvisitor::visit(ArrayDereference& node) {
     auto len = node.id->len;
     std::string okLabel = emitOobCheck(indexVar, len);  // Already emits okLabel at end
 
-    printWithStars({indexVar});
     int offset = node.id->offset;
     std::string basePtrRaw = cb->freshVar();
     cb->emit(basePtrRaw + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(offset));
@@ -759,10 +759,10 @@ void codeGvisitor::visit(ArrayDereference& node) {
     std::string elemPtr = cb->freshVar();
     cb->emit(elemPtr + " = getelementptr " + llvmElemType + ", " + llvmElemType + "* " + basePtr + ", i32 " + indexVar);
 
-   // std::string loaded = cb->freshVar();
-  //  cb->emit(loaded + " = load " + llvmElemType + ", " + llvmElemType + "* " + elemPtr + ", align 4");
+    std::string loaded = cb->freshVar();
+    cb->emit(loaded + " = load " + llvmElemType + ", " + llvmElemType + "* " + elemPtr + ", align 4");
 
-    node.newVar = elemPtr;
+    node.newVar = loaded;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void codeGvisitor::visit(Cast& node)
