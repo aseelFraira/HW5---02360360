@@ -441,15 +441,9 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
     node.exp->accept(*this);
 
     std::string reg = cb->freshVar();
-    if (auto isNum = std::dynamic_pointer_cast<Num>(node.index)) {
-        if (isNum->type == ast::BuiltInType::INT) {
-            cb->emit(reg + " = add i32 0, " + std::to_string(isNum->value));
-            node.index->newVar = reg;
-        }
-    }else if (auto isByte = std::dynamic_pointer_cast<NumB>(node.index)) {
-            cb->emit(reg + " = add i8 0, " + std::to_string(isNum->value));
-            node.index->newVar = reg;
-    }
+    cb->emit(reg + " = add i32 0, " + node.index->newVar);
+    node.index->newVar = reg;
+
 
 
     std::string indexVar = node.index->newVar;
