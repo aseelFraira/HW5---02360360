@@ -157,6 +157,7 @@ void codeGvisitor::visit(VarDecl& node) {
         }
     }else {
         if (node.init_exp) {
+            std::cerr << "[DEBUG] - we made it here " << node.init_exp->line << std::endl;
             node.init_exp->accept(*this);
             std::string initValueVar = node.init_exp->newVar;
             cb->emit(
