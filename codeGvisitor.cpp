@@ -759,12 +759,10 @@ void codeGvisitor::visit(ArrayDereference& node) {
     std::string elemPtr = cb->freshVar();
     cb->emit(elemPtr + " = getelementptr " + llvmElemType + ", " + llvmElemType + "* " + basePtr + ", i32 " + indexVar);
 
-    std::string loaded = cb->freshVar();
-    cb->emit(loaded + " = load " + llvmElemType + ", " + llvmElemType + "* " + elemPtr + ", align 4");
+   // std::string loaded = cb->freshVar();
+  //  cb->emit(loaded + " = load " + llvmElemType + ", " + llvmElemType + "* " + elemPtr + ", align 4");
 
-    std::cerr<<"[DEBUG] - After null" << std::endl;
-
-    node.newVar = loaded;
+    node.newVar = elemPtr;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void codeGvisitor::visit(Cast& node)
