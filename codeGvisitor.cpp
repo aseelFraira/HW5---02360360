@@ -165,6 +165,8 @@ void codeGvisitor::visit(VarDecl& node) {
             cb->emit(
                     "store " + llvmType + " " + initValueVar + ", " + llvmType +
                     "* " + finalPtr);
+            printWithStars({initValueVar});
+
         } else {
             std::string defaultValue = (node.id->type == BuiltInType::BOOL)
                                        ? "false" : "0";
