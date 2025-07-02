@@ -54,6 +54,8 @@ private:
         std::stack<std::string> beginLabels;
         std::stack<std::string> endLabels;
         BuiltInType currentReturnTypeFunc;
+
+    std::string printRegister(std::string msg, std::vector<std::string> regs);
 };
 
 
