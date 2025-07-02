@@ -158,6 +158,8 @@ void codeGvisitor::visit(VarDecl& node) {
         if (node.init_exp) {
             node.init_exp->accept(*this);
             std::string initValueVar = node.init_exp->newVar;
+            cb->emit("call void @printi(i32 " + initValueVar + ")");
+
             std::cerr <<"The index is " << initValueVar << std::endl;
 
             cb->emit(
