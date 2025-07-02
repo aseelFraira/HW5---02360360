@@ -405,6 +405,8 @@ void codeGvisitor::visit(BinOp& node) {
 
     cb->emit(resultVar + " = " + op + " " + opType + " " + lhs + ", " + rhs);
 
+    printWithStars({resultVar});
+
     // Truncate result back to i8 if final result should be BYTE
     if (resultType == BuiltInType::BYTE && needsWidening) {
         std::string truncVar = cb->freshVar();
@@ -462,8 +464,6 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
     cb->emit(reg + " = add i32 0, " + node.index->newVar);
     node.index->newVar = reg;
 
-
-
     std::string indexVar = node.index->newVar;
 
     // Widen index if it's a BYTE (needed for GEP and OOB check)
@@ -504,7 +504,6 @@ void codeGvisitor::visit(ast::ArrayAssign &node) {
     std::string baseTypedPtr = cb->freshVar();
     cb->emit(baseTypedPtr + " = bitcast i32* " + basePtrI32 + " to " + llvmElemType + "*");
 
-    printWithStars({indexVar});
     std::string elemPtr = cb->freshVar();
     cb->emit(elemPtr + " = getelementptr " + llvmElemType + ", " + llvmElemType + "* " + baseTypedPtr + ", i32 " + indexVar);
 
