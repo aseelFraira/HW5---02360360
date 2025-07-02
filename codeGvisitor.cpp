@@ -174,6 +174,10 @@ void codeGvisitor::visit(VarDecl& node) {
                     "* " + finalPtr);
         }
     }
+    cb->emit(node.id->newVar + " = load " + llvmType + ", " + llvmType + "* " + finalPtr);
+    printWithStars({node.id->newVar});
+
+
 
 }
 ///////////////////////////////Return///////////////////////////////////////////
@@ -335,7 +339,6 @@ void codeGvisitor::visit(BinOp& node) {
 
     std::string lhs = node.left->newVar;
     std::string rhs = node.right->newVar;
-    printWithStars({lhs,rhs});
 
 
     BuiltInType resultType = node.type;
