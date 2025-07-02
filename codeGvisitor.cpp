@@ -763,7 +763,7 @@ void codeGvisitor::visit(ArrayDereference& node) {
     std::string loaded = cb->freshVar();
     cb->emit(loaded + " = load " + llvmElemType + ", " + llvmElemType + "* " + elemPtr + ", align 4");
 
-    printWithStars({loaded});
+    printWithStars({indexVar,loaded});
 
     node.newVar = loaded;
 }
