@@ -254,7 +254,6 @@ void codeGvisitor::visit(Call& node) {
     for (int i = 0; i < node.args->exps.size(); i++) {
         const auto &arg = node.args->exps[i];
         arg->accept(*this);
-        argTypes.push_back(output::changeType(arg->type));
         if (arg->type == ast::BuiltInType::STRING) {//
             string strArray = cb->emitString(arg->newVar);
             std::string ptrVar = cb->freshVar();
@@ -262,14 +261,18 @@ void codeGvisitor::visit(Call& node) {
             cb->emit(ptrVar + " = getelementptr [" + std::to_string(len) + " x i8], [" +
                     std::to_string(len) + " x i8]* " + strArray + ", i32 0, i32 0");
             argValues.push_back(ptrVar);
+            argTypes.push_back(output::changeType(arg->type));
         }
         else if (arg->type == ast::BuiltInType::BYTE &&
                  node.typesOfArgs[i] == ast::BuiltInType::INT) { //maybe should push the new type!
             std::string promotedVar = cb->freshVar();
             cb->emit(promotedVar + " = zext i8 " + arg->newVar + " to i32");
             argValues.push_back(promotedVar);
+            argTypes.push_back(output::changeType(ast::BuiltInType::INT));
         }else{
             argValues.push_back(arg->newVar);
+            argTypes.push_back(output::changeType(arg->type));
+
         }
     }
 
