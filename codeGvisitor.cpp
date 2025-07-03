@@ -8,7 +8,7 @@ using namespace std;
 using namespace ast;
 
 codeGvisitor::codeGvisitor(output::CodeBuffer* cb): cb(cb)
-{
+{ //  //
  cb->emit(R"(
 declare i32 @scanf(i8*, ...)
 declare i32 @printf(i8*, ...)
