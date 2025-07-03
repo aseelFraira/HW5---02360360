@@ -893,7 +893,5 @@ void codeGvisitor::printWithStars(const std::vector<std::string> &regs) {
     for (const auto& reg : regs) {
         cb->emit("call void @printi(i32 " + reg + ")");
     }
-
-
 }
 
