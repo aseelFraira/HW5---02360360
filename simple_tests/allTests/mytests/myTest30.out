@@ -1,0 +1,19 @@
+Array contents:
+15
+3
+42
+8
+23
+7
+91
+Testing search for 42:
+Found at position
+2
+Testing search for 7:
+Found at position
+5
+Testing search for 100:
+Not found
+Testing search for 15:
+Found at position
+0

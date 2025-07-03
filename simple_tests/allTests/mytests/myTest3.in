@@ -1,0 +1,27 @@
+void main() {
+    int counter = 0;
+    
+    print("Testing while loop:");
+    while (counter < 5) {
+        printi(counter);
+        counter = counter + 1;
+    }
+    
+    print("Testing nested loops:");
+    int i = 0;
+    while (i < 3) {
+        int j = 0;
+        while (j < 2) {
+            printi(i * 10 + j);
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    print("Testing simple arithmetic:");
+    int x = 10;
+    int y = 5;
+    printi(x + y);
+    printi(x - y);
+    printi(x * y);
+}

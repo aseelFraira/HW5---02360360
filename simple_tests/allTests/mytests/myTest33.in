@@ -1,0 +1,26 @@
+void main() {
+    // Test comprehensive type conversions and operations
+    byte b1 = 10b;
+    byte b2 = 20b;
+    int i1 = 100;
+    int i2 = 200;
+    
+    print("Byte operations:");
+    printi(b1 + b2);        // byte + byte = byte -> 30
+    printi(b1 * b2);        // byte * byte = byte -> 200
+    printi(b2 - b1);        // byte - byte = byte -> 10
+    
+    print("Mixed operations:");
+    printi(b1 + i1);        // byte + int = int -> 110
+    printi(i1 - b1);        // int - byte = int -> 90
+    printi(b1 * i1);        // byte * int = int -> 1000
+    
+    print("Integer operations:");
+    printi(i1 + i2);        // int + int = int -> 300
+    printi(i2 - i1);        // int - int = int -> 100
+    printi(i1 * 2);         // int * int = int -> 200
+    
+    print("Complex expressions:");
+    printi((b1 + b2) * i1); // (byte + byte) * int -> 30 * 100 = 3000
+    printi(i1 + (b1 * b2)); // int + (byte * byte) -> 100 + 200 = 300
+}

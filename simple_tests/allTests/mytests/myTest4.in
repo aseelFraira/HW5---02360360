@@ -1,0 +1,46 @@
+void main() {
+    print("Testing string operations:");
+    print("Hello World!");
+    print("This is a test string");
+    
+    testStringFunction();
+    
+    print("Testing mixed types:");
+    int num = 42;
+    byte b = 255b;
+    bool flag = true;
+    
+    printMixedValues(num, b, flag);
+    
+    print("Testing return values:");
+    int result = calculateSum(10, 20);
+    printi(result);
+    
+    byte byteResult = getMaxByte();
+    printi(byteResult);
+}
+
+void testStringFunction() {
+    print("Function received:");
+    print("Parameter string");
+}
+
+void printMixedValues(int i, byte b, bool flag) {
+    print("Integer:");
+    printi(i);
+    print("Byte:");
+    printi(b);
+    if (flag) {
+        print("Boolean: true");
+    } else {
+        print("Boolean: false");
+    }
+}
+
+int calculateSum(int a, int b) {
+    return a + b;
+}
+
+byte getMaxByte() {
+    return 255b;
+}

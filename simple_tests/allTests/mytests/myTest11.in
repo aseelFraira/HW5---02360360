@@ -1,0 +1,26 @@
+void main() {
+    // Test array initialization and access patterns
+    int arr[8];
+    
+    // Initialize array with pattern
+    arr[0] = 10; arr[1] = 20; arr[2] = 30; arr[3] = 40;
+    arr[4] = 50; arr[5] = 60; arr[6] = 70; arr[7] = 80;
+    
+    // Print all elements
+    int i = 0;
+    while (i < 8) {
+        printi(arr[i]);
+        i = i + 1;
+    }
+    
+    // Test array modification
+    arr[2] = 999;
+    arr[6] = 888;
+    
+    print("After modification:");
+    i = 0;
+    while (i < 8) {
+        printi(arr[i]);
+        i = i + 1;
+    }
+}

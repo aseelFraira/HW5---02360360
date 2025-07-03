@@ -1,0 +1,36 @@
+void main() {
+    // Test complex boolean expressions
+    bool a = true;
+    bool b = false;
+    bool c = true;
+    
+    // Test multiple AND operations
+    if (a and b and c) {
+        print("All true");
+    } else {
+        print("Not all true");
+    }
+    
+    // Test multiple OR operations  
+    if (a or b or c) {
+        print("At least one true");
+    }
+    
+    // Test mixed operations
+    if ((a and c) or b) {
+        print("Mixed condition 1 true");
+    }
+    
+    if (a and (b or c)) {
+        print("Mixed condition 2 true");
+    }
+    
+    // Test negation combinations
+    if (not (a and b)) {
+        print("Not (a and b) is true");
+    }
+    
+    if (not a or not b) {
+        print("Not a or not b is true");
+    }
+}

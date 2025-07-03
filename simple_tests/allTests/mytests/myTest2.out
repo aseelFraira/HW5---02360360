@@ -1,0 +1,7 @@
+Testing boolean operations:
+AND operation works
+OR operation works
+NOT operation works
+Complex boolean expression: true
+Function received true
+Function received false

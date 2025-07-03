@@ -1,0 +1,9 @@
+void main() {
+    // Test arithmetic operations
+    int a = 10;
+    int b = 3;
+    printi(a + b);  // 13
+    printi(a - b);  // 7
+    printi(a * b);  // 30
+    printi(a / b);  // 3
+}

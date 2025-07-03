@@ -1,0 +1,9 @@
+void main() {
+    // Test division by zero error
+    int x = 10;
+    int y = 5;
+    int z = y - 5;  // z = 0
+    
+    printi(x / y);   // Should work: 2
+    printi(x / z);   // Should trigger error: division by zero
+}

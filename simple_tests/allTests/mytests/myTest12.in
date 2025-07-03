@@ -1,0 +1,36 @@
+void main() {
+    // Simple array operations test
+    int arr[3];
+    arr[0] = 30;
+    arr[1] = 10;
+    arr[2] = 20;
+    
+    print("Before:");
+    printi(arr[0]);
+    printi(arr[1]);
+    printi(arr[2]);
+    
+    // Simple manual sort (just swap if needed)
+    if (arr[0] > arr[1]) {
+        int temp = arr[0];
+        arr[0] = arr[1];
+        arr[1] = temp;
+    }
+    
+    if (arr[1] > arr[2]) {
+        int temp = arr[1];
+        arr[1] = arr[2];
+        arr[2] = temp;
+    }
+    
+    if (arr[0] > arr[1]) {
+        int temp = arr[0];
+        arr[0] = arr[1];
+        arr[1] = temp;
+    }
+    
+    print("After:");
+    printi(arr[0]);
+    printi(arr[1]);
+    printi(arr[2]);
+}

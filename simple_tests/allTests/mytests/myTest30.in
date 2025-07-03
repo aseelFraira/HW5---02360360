@@ -1,0 +1,56 @@
+// Test array search using only local variables
+void searchArray(int target) {
+    int data[7];
+    int searchSize = 7;
+    // Initialize data array
+    data[0] = 15; data[1] = 3; data[2] = 42;
+    data[3] = 8; data[4] = 23; data[5] = 7; data[6] = 91;
+    
+    int found = 0;  // Using int as boolean
+    int position = 999;  // Use 999 to indicate "not found" instead of -1
+    
+    int i = 0;
+    while (i < searchSize) {
+        if (data[i] == target) {
+            found = 1;
+            position = i;
+            i = searchSize; // Exit loop by setting i to size
+        }
+        i = i + 1;
+    }
+    
+    if (found == 1) {
+        print("Found at position");
+        printi(position);
+    } else {
+        print("Not found");
+    }
+}
+
+void printArray() {
+    int data[7];
+    // Initialize data array
+    data[0] = 15; data[1] = 3; data[2] = 42;
+    data[3] = 8; data[4] = 23; data[5] = 7; data[6] = 91;
+    
+    print("Array contents:");
+    int i = 0;
+    while (i < 7) {
+        printi(data[i]);
+        i = i + 1;
+    }
+}
+
+void main() {
+    printArray();
+    
+    // Test searches
+    print("Testing search for 42:");
+    searchArray(42);   // Should find at position 2
+    print("Testing search for 7:");
+    searchArray(7);    // Should find at position 5  
+    print("Testing search for 100:");
+    searchArray(100);  // Should not find
+    print("Testing search for 15:");
+    searchArray(15);   // Should find at position 0
+}

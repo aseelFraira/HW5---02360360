@@ -1,0 +1,19 @@
+void testStrings() {
+    print("Hello, World!");
+    print("Testing strings");
+    print("End of strings");
+}
+
+void testMixedOutput() {
+    print("Number:");
+    printi(42);
+    print("Boolean:");
+    if (true) print("TRUE");
+    else print("FALSE");
+}
+
+void main() {
+    testStrings();
+    print("---");
+    testMixedOutput();
+}

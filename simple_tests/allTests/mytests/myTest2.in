@@ -1,0 +1,35 @@
+void main() {
+    bool flag = true;
+    
+    print("Testing boolean operations:");
+    
+    if (flag and true) {
+        print("AND operation works");
+    }
+    
+    if (flag or false) {
+        print("OR operation works");
+    }
+    
+    if (not false) {
+        print("NOT operation works");
+    }
+    
+    bool result = (true and false) or (true and true);
+    if (result) {
+        print("Complex boolean expression: true");
+    } else {
+        print("Complex boolean expression: false");
+    }
+    
+    testBooleanFunction(true);
+    testBooleanFunction(false);
+}
+
+void testBooleanFunction(bool value) {
+    if (value) {
+        print("Function received true");
+    } else {
+        print("Function received false");
+    }
+}

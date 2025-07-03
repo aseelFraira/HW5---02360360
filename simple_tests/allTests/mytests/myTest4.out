@@ -1,0 +1,14 @@
+Testing string operations:
+Hello World!
+This is a test string
+Function received:
+Parameter string
+Testing mixed types:
+Integer:
+42
+Byte:
+255
+Boolean: true
+Testing return values:
+30
+255

@@ -1,0 +1,27 @@
+void main() {
+    // Test arrays of different sizes
+    int small[1];
+    int medium[10];
+    int large[100];
+    
+    // Initialize and test small array
+    small[0] = 999;
+    printi(small[0]);
+    
+    // Test boundary access for medium array
+    medium[0] = 100;
+    medium[9] = 200;
+    printi(medium[0]);
+    printi(medium[9]);
+    
+    // Test large array indexing
+    large[0] = 1;
+    large[50] = 51;
+    large[99] = 100;
+    printi(large[0]);
+    printi(large[50]);
+    printi(large[99]);
+    
+    // Test out of bounds access
+    printi(small[1]);  // Should cause error
+}

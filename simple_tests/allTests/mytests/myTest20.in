@@ -1,0 +1,39 @@
+int max(int a, int b) {
+    if (a > b) return a;
+    return b;
+}
+
+int min(int a, int b) {
+    if (a < b) return a;
+    return b;
+}
+
+int abs(int n) {
+    if (n < 0) return 0 - n;
+    return n;
+}
+
+void testMathFunctions() {
+    int x = 15;
+    int y = 25;
+    int z = 10;  // Changed from -10 to 10
+    
+    print("Testing max:");
+    printi(max(x, y));  // 25
+    printi(max(y, x));  // 25
+    printi(max(x, x));  // 15
+    
+    print("Testing min:");
+    printi(min(x, y));  // 15
+    printi(min(y, x));  // 15
+    printi(min(z, x));  // 10 (changed from -10)
+    
+    print("Testing abs:");
+    printi(abs(0 - z)); // 10 (abs of negative z)
+    printi(abs(x));     // 15
+    printi(abs(0));     // 0
+}
+
+void main() {
+    testMathFunctions();
+}

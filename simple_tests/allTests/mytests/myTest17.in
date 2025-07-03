@@ -1,0 +1,17 @@
+void main() {
+    // Test simple scoping
+    int x = 10;
+    print("Outer x:");
+    printi(x);
+    
+    {
+        int y = 20;  // Different variable name
+        print("Inner y:");
+        printi(y);
+        print("Outer x still:");
+        printi(x);
+    }
+    
+    print("Back to outer:");
+    printi(x);
+}

@@ -1,0 +1,14 @@
+void main(){
+	int arr[5];
+	arr[0] = 1 + 2;
+	arr[3] = 10;
+	int x = arr[1];
+	int y = x + 5;
+	arr[1] = y;
+	printi(arr[0]);
+	printi(arr[1]);
+	printi(arr[2]);
+	printi(arr[3]);
+	printi(arr[4]);
+	printi(arr[5]);
+}

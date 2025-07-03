@@ -1,0 +1,33 @@
+void main() {
+    // Test array statistics without function parameters
+    int data[6];
+    data[0] = 15;
+    data[1] = 3;
+    data[2] = 42;
+    data[3] = 8;
+    data[4] = 23;
+    data[5] = 7;
+    
+    // Find min, max, and sum directly in main
+    int min = data[0];
+    int max = data[0];
+    int sum = 0;
+    int size = 6;
+    
+    int i = 0;
+    while (i < size) {
+        if (data[i] < min) min = data[i];
+        if (data[i] > max) max = data[i];
+        sum = sum + data[i];
+        i = i + 1;
+    }
+    
+    print("Min:");
+    printi(min);
+    print("Max:");
+    printi(max);
+    print("Sum:");
+    printi(sum);
+    print("Average:");
+    printi(sum / size);
+}

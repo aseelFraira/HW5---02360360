@@ -1,0 +1,13 @@
+void main() {
+    // Test relational operations
+    int x = 10;
+    int y = 20;
+    byte a = 15b;
+    
+    if (x < y) print("x < y");
+    if (y > x) print("y > x");
+    if (x <= a) print("x <= a");
+    if (a >= x) print("a >= x");
+    if (x == 10) print("x == 10");
+    if (y != x) print("y != x");
+}

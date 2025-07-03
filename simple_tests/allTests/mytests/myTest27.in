@@ -1,0 +1,4 @@
+void main() {
+    // Test minimal program
+    print("Hello World");
+}

@@ -1,0 +1,9 @@
+void main() {
+    // Test array bounds checking
+    int arr[2];
+    arr[0] = 100;
+    arr[1] = 200;
+    
+    printi(arr[0]);   // Valid: 100
+    printi(arr[2]);   // Should trigger error: out of bounds
+}

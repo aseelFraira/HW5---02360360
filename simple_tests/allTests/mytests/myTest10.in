@@ -1,0 +1,17 @@
+int factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+int power(int base, int exp) {
+    if (exp == 0) return 1;
+    if (exp == 1) return base;
+    return base * power(base, exp - 1);
+}
+
+void main() {
+    printi(factorial(5));    // 120
+    printi(factorial(0));    // 1
+    printi(power(2, 3));     // 8
+    printi(power(3, 2));     // 9
+}
