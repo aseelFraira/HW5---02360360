@@ -261,7 +261,7 @@ void codeGvisitor::visit(Call& node) {
             cb->emit(ptrVar + " = getelementptr [" + std::to_string(len) + " x i8], [" +
                     std::to_string(len) + " x i8]* " + strArray + ", i32 0, i32 0");
             argValues.push_back(ptrVar);
-            argTypes.push_back(output::changeType(arg->type));
+            argTypes.push_back(output::changeType(arg->type)); //
         }
         else if (arg->type == ast::BuiltInType::BYTE &&
                  node.typesOfArgs[i] == ast::BuiltInType::INT) { //maybe should push the new type!
