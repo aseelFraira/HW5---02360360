@@ -204,7 +204,7 @@ void codeGvisitor::visit(While& node) {
 
     // Unconditional branch to condition check
     cb->emit("br label " + condLabel);
-    cb->emit("");
+   // cb->emit("");
     cb->emitLabel(condLabel);
 
     // Generate code for the loop condition
@@ -213,7 +213,7 @@ void codeGvisitor::visit(While& node) {
 
     // br i1 %cond, label %body_label, label %end_label
     cb->emit("br i1 " + condVar + ", label " + bodyLabel + ", label " + endLabel);
-    cb->emit("");
+    //cb->emit("");
 
     // Emit body block
     cb->emitLabel(bodyLabel);
