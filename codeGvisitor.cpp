@@ -338,12 +338,10 @@ void codeGvisitor::visit(If& node) {
 /*LLVM syntax: %res = add i32 %a, %b <-> a+b*/
 void codeGvisitor::visit(BinOp& node) {
     // Visit both operands first
-    printWithStars({node.left->newVar}); // node.left->newVar = emptyyyy
 
     node.left->accept(*this);
     node.right->accept(*this);
 
-    printWithStars({node.left->newVar}); // node.left->newVar = wrong value
 
 
     std::string lhs = node.left->newVar;
