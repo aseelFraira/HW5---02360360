@@ -338,10 +338,13 @@ void codeGvisitor::visit(If& node) {
 /*LLVM syntax: %res = add i32 %a, %b <-> a+b*/
 void codeGvisitor::visit(BinOp& node) {
     // Visit both operands first
-    printWithStars({node.left->newVar});
+    printWithStars({node.left->newVar}); // node.left->newVar = emptyyyy
 
     node.left->accept(*this);
     node.right->accept(*this);
+
+    printWithStars({node.left->newVar}); // node.left->newVar = wrong value
+
 
     std::string lhs = node.left->newVar;
     std::string rhs = node.right->newVar;
@@ -447,11 +450,14 @@ void codeGvisitor::visit(Assign& node)
         cb->emit(arrayOffReg + " = add i32 0, " + isArray->index->newVar);
     }
 
-   
-    int off = node.id->offset; 
+
+
+    int off = node.id->offset;
+    std::string gepIndex = cb->freshVar();
+    cb->emit(gepIndex + " = add i32 " + std::to_string(off) + ", " + arrayOffReg);
+
     std::string offPoi = cb->freshVar();
-    cb->emit(offPoi + " = add i32 " + offPoi + ", " + arrayOffReg);
-    cb->emit(offPoi + " = getelementptr i32, i32* %local_vars, i32 " + std::to_string(off));
+    cb->emit(offPoi + " = getelementptr i32, i32* %local_vars, i32 " + gepIndex);
 
   
     std::string tyoechanged = output::changeType(node.exp->type); 
