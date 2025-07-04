@@ -8,7 +8,7 @@ using namespace std;
 using namespace ast;
 
 codeGvisitor::codeGvisitor(output::CodeBuffer* cb): cb(cb)
-{
+{ //  //
  cb->emit(R"(
 declare i32 @scanf(i8*, ...)
 declare i32 @printf(i8*, ...)
@@ -204,16 +204,17 @@ void codeGvisitor::visit(While& node) {
 
     // Unconditional branch to condition check
     cb->emit("br label " + condLabel);
-    cb->emit("");
+   // cb->emit("");
     cb->emitLabel(condLabel);
 
     // Generate code for the loop condition
     node.condition->accept(*this);
     std::string condVar = node.condition->newVar;
-
+   //auto deb std::dynamic_pointer_cast<exp>(node.body->statements.back()
+//std::cerr<
     // br i1 %cond, label %body_label, label %end_label
     cb->emit("br i1 " + condVar + ", label " + bodyLabel + ", label " + endLabel);
-    cb->emit("");
+    //cb->emit("");
 
     // Emit body block
     cb->emitLabel(bodyLabel);
@@ -893,7 +894,5 @@ void codeGvisitor::printWithStars(const std::vector<std::string> &regs) {
     for (const auto& reg : regs) {
         cb->emit("call void @printi(i32 " + reg + ")");
     }
-
-
 }
 
