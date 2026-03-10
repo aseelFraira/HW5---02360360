@@ -39,7 +39,10 @@ A compiler for **FuncC**, a statically-typed, C-like language. The compiler impl
 │       ├── codeGvisitor.*     # LLVM IR code generation pass
 │       ├── output.*           # Error reporting & CodeBuffer for IR emission
 │       └── print_functions.llvm
-├── tests/                     # Test suites & runner scripts
+├── tests/
+│   ├── run_tests.sh           # Automated test runner
+│   ├── README.md              # Testing guide
+│   └── allTests/              # Test suites (*.in / *.out pairs)
 ├── examples/                  # LLVM IR example programs
 ├── .gitignore
 ├── Makefile

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Navigate to project root (two levels up from tests/simple_tests/)
-PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# Navigate to project root
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Compile the project
@@ -14,8 +14,7 @@ if [ $? -ne 0 ]; then
 fi
 
 TEST_DIRS=()
-# get all sub-dirs of allTests
-for dir in tests/simple_tests/allTests/*/; do
+for dir in tests/allTests/*/; do
     TEST_DIRS+=("$dir")
 done
 
@@ -40,7 +39,7 @@ for DIR in "${TEST_DIRS[@]}"; do
         LL_FILE="$DIR/$BASENAME.ll"
         RES_FILE="$DIR/$BASENAME.res"
 
-        # Run program and save output to .res file
+        # Run compiler and then execute LLVM IR
         ./hw5 < "$IN_FILE" 2>&1 > "$LL_FILE"
         lli "$LL_FILE" > "$RES_FILE" 2> /dev/null
 
