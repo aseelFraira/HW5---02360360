@@ -43,8 +43,6 @@ A full compiler pipeline for a C-like language, built as Homework 5 for the Comp
 │   ├── hw5-tests/             # Test inputs & expected outputs
 │   ├── simple_tests/          # Test runner & extended suites
 │   └── selfcheck-hw5          # Self-check script
-├── docs/
-│   └── T9_LLVM.pptx           # Course lecture slides
 ├── examples/                  # LLVM IR example programs
 ├── .gitignore
 ├── Makefile
