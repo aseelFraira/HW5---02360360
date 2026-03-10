@@ -1,0 +1,11 @@
+void main() {
+    // Test byte operations and type mixing
+    byte x = 10b;
+    byte y = 3b;
+    int z = 5;
+    
+    printi(x + y);  // byte + byte = byte -> 13
+    printi(x + z);  // byte + int = int -> 15
+    printi(z - x);  // int - byte = int -> -5
+    printi(x * y);  // byte * byte = byte -> 30
+}

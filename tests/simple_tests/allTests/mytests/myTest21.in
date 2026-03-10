@@ -1,0 +1,28 @@
+void main() {
+    // Test logical evaluation (non-short-circuit)
+    bool flag = false;
+    int x = 5;
+    int y = 0;
+    
+    // Test AND operation - both sides evaluated
+    if (flag and x > 0) {
+        print("This should not print");
+    } else {
+        print("AND works correctly");
+    }
+    
+    // Test OR operation - both sides evaluated
+    flag = true;
+    if (flag or x > 10) {
+        print("OR works correctly");
+    }
+    
+    // Test complex boolean expression
+    flag = false;
+    if (not flag and x > 0) {
+        print("Complex expression works");
+    }
+    
+    // Test division by zero in separate statement
+    printi(x / y);  // This will cause division by zero error
+}

@@ -1,0 +1,12 @@
+void main() {
+    // Test zero division with variables
+    int a = 10;
+    int b = 5;
+    int c = 0;
+    
+    printi(a / b);  // Should work: 2
+    
+    // Multiple operations leading to zero
+    int d = b - 5;  // d = 0
+    printi(a / d);  // Should trigger division by zero error
+}

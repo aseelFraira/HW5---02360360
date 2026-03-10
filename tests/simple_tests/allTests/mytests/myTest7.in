@@ -1,0 +1,21 @@
+void main() {
+    // Test logical operations with short-circuit evaluation
+    bool a = true;
+    bool b = false;
+    
+    if (a and b) {
+        print("should not print");
+    }
+    
+    if (a or b) {
+        print("a or b is true");
+    }
+    
+    if (not b) {
+        print("not b is true");
+    }
+    
+    if (not a and b) {
+        print("should not print either");
+    }
+}

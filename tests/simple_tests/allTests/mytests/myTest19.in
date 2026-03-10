@@ -1,0 +1,20 @@
+void main() {
+    // Test edge cases with byte values
+    byte maxbyte = 255b;
+    byte minbyte = 0b;
+    
+    printi(maxbyte);
+    printi(minbyte);
+    
+    // Test byte arithmetic that might overflow/underflow
+    byte a = 200b;
+    byte b = 100b;
+    
+    // byte + byte = byte (with overflow: 300 -> 44)
+    printi(a + b);  // 44 (byte overflow)
+    
+    // Test with small values
+    byte x = 1b;
+    byte y = 2b;
+    printi(x + y);  // 3 (stays byte)
+}

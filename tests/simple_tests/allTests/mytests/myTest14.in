@@ -1,0 +1,11 @@
+void main() {
+    // Test array bounds checking
+    byte smallarray[3];
+    smallarray[0] = 10b;
+    smallarray[1] = 20b;
+    smallarray[2] = 30b;
+    
+    printi(smallarray[0]);  // Valid: 10
+    printi(smallarray[2]);  // Valid: 30
+    printi(smallarray[3]);  // Should trigger error: out of bounds
+}

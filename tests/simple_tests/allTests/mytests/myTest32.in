@@ -1,0 +1,19 @@
+void printTriangleRow(int n) {
+    // Simple function to print powers of 2 up to n
+    print("Row:");
+    int i = 1;
+    int power = 1;
+    while (i <= n) {
+        printi(power);
+        power = power * 2;
+        i = i + 1;
+    }
+}
+
+void main() {
+    print("Simple number patterns:");
+    printTriangleRow(1);
+    printTriangleRow(2);
+    printTriangleRow(3);
+    printTriangleRow(4);
+}

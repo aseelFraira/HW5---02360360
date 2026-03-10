@@ -1,0 +1,11 @@
+# Build artifacts
+build/
+hw5
+hw5.exe
+
+# IDE
+.idea/
+cmake-build-debug/
+
+# Archives
+*.zip

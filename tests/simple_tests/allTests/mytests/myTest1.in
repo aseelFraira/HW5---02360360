@@ -1,0 +1,21 @@
+void main() {
+    int arr[5];
+    
+    print("Initializing array:");
+    arr[0] = 10;
+    arr[1] = 20;
+    arr[2] = 30;
+    arr[3] = 40;
+    arr[4] = 50;
+    
+    print("Array elements:");
+    printi(arr[0]);
+    printi(arr[1]);
+    printi(arr[2]);
+    printi(arr[3]);
+    printi(arr[4]);
+    
+    int sum = arr[0] + arr[1] + arr[2] + arr[3] + arr[4];
+    print("Sum of array elements:");
+    printi(sum);
+}

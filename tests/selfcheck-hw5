@@ -1,0 +1,100 @@
+#!/bin/bash 
+
+# Configuration
+hostname="cscomp"
+tmpdir="selfcheck_tmp"
+
+# Check hostname
+if [ "$(hostname)" != "$hostname" ]; then 
+    echo "This script is only intended to run on $hostname!" 
+    exit 
+fi 
+
+# Check for input file
+if [ -z "$1" ]; then 
+    echo "Usage: $0 submission_file"
+    exit 
+fi
+
+if [ ! -f "$1" ]; then
+    echo "Submission zip file not found!" 
+    exit 
+fi 
+
+# Clean and recreate temp dir
+rm -rf "$tmpdir" &> /dev/null 
+
+if [ -d "$tmpdir" ]; then 
+    echo "Cannot clear tmp directory. Please delete '$tmpdir' manually and try again" 
+    exit 
+fi 
+
+mkdir "$tmpdir" || { echo "Failed to create tmp directory!"; exit; }
+
+# Unzip submission
+unzip "$1" -d "$tmpdir" &> /dev/null 
+if [[ $? != 0 ]]; then 
+    echo "Unable to unzip submission file!" 
+    exit
+fi
+
+cd "$tmpdir" || exit
+
+# Check required files
+for file in scanner.lex parser.y output.cpp output.hpp; do
+    if [ ! -f "$file" ]; then
+        echo "File $file not found!"
+        exit
+    fi
+done
+
+# Copy makefile from script directory
+cp ../Makefile . || { echo "makefile not found in script directory!"; exit; }
+
+# Build
+make -f Makefile
+if [ ! -f hw5 ]; then 
+    echo "Cannot build submission!" 
+    exit 
+fi 
+
+# Unzip test files
+if [ ! -f ../hw5-tests.zip ]; then
+    echo "Test file 'hw5-tests.zip' not found in script directory!"
+    exit
+fi
+
+unzip ../hw5-tests.zip &> /dev/null
+if [ $? != 0 ]; then
+    echo "Unable to unzip test files!"
+    exit
+fi
+
+# Number of tests
+numtests=4
+# Run tests
+for i in $(seq 1 $numtests); do
+    if [ ! -f t$i.in ] || [ ! -f t$i.out ]; then
+        echo "Missing test files t$i.in or t$i.out!"
+        exit
+    fi
+
+    ./hw5 < t$i.in > t$i.ll
+    lli t$i.ll > t$i.res
+
+    diff t$i.res t$i.out &> /dev/null 
+    if [[ $? != 0 ]]; then
+        echo "Failed test #$i!"
+        exit 
+    fi 
+done 
+
+# Cleanup test input/output/result files before exit
+for i in $(seq 1 $numtests); do
+    rm -f t$i.in t$i.out t$i.ll t$i.res
+done
+
+cd - &> /dev/null
+rm -rf "$tmpdir"
+echo "Ok to submit :)"
+exit
