@@ -6,8 +6,7 @@
 tests/
 ├── run_tests.sh         # Automated test runner
 ├── allTests/
-│   ├── hw5-tests/       # Core test cases
-│   └── mytests/         # Extended test cases
+│   └── mytests/         # Test cases
 └── README.md
 ```
 
