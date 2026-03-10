@@ -80,7 +80,7 @@ for DIR in "${TEST_DIRS[@]}"; do
         ((TOTAL++))
 
         # Run compiler and execute LLVM IR
-        ./hw5 < "$IN_FILE" 2>&1 > "$LL_FILE"
+        ./hw5 < "$IN_FILE" > "$LL_FILE" 2>&1
         lli "$LL_FILE" > "$RES_FILE" 2> /dev/null
 
         # Compare result
