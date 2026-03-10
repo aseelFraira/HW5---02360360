@@ -40,9 +40,17 @@ A compiler for **FuncC**, a statically-typed, C-like language. The compiler impl
 │       ├── output.*           # Error reporting & CodeBuffer for IR emission
 │       └── print_functions.llvm
 ├── tests/
-│   ├── run_tests.sh           # Automated test runner
+│   ├── run_tests.sh           # Automated test runner (supports single suite & verbose mode)
 │   ├── README.md              # Testing guide
-│   └── allTests/              # Test suites (*.in / *.out pairs)
+│   ├── arithmetic/            # Integer ops, byte mixing, precedence
+│   ├── arrays/                # Init, sort, search, matrix multiply
+│   ├── boolean_logic/         # AND/OR/NOT, short-circuit
+│   ├── control_flow/          # While, nested loops
+│   ├── edge_cases/            # Division by zero, out-of-bounds
+│   ├── functions/             # Recursion, return values, helpers
+│   ├── minimal/               # Hello world, basic programs
+│   ├── relational/            # All comparison operators
+│   └── scoping/               # Nested block scoping
 ├── examples/                  # LLVM IR example programs
 ├── .gitignore
 ├── Makefile
